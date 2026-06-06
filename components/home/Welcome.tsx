@@ -1,6 +1,6 @@
 function Welcome() {
     return (
-        <section className="flex flex-col min-h-screen px-6 sm:px-12 md:px-16 lg:px-24 w-full bg-background text-foreground pt-16 pb-6">
+        <section className="flex flex-col min-h-screen px-6 sm:px-12 md:px-16 lg:px-24 w-full bg-background text-foreground pt-16">
             <div className="flex-1 flex flex-col items-center justify-between max-w-5xl w-full mx-auto">
                 
                 {/* Top/Middle Content Wrapper */}
@@ -24,13 +24,13 @@ function Welcome() {
                     </header>
 
                     {/* Call to Action Buttons */}
-                    <div className="flex items-center justify-center gap-4 mt-8">
+                    <div className="flex items-center justify-center gap-4">
                         {/* Buttons go here */}
                     </div>
                 </div>
 
                 {/* Image Container Box - Justified to the bottom */}
-                <div className="w-full max-w-4xl aspect-4/1 bg-zinc-800/50 border border-zinc-800 rounded-lg overflow-hidden flex items-center justify-center text-muted-foreground mt-8">
+                <div className="w-full max-w-4xl aspect-4/1 bg-zinc-800/50 border border-zinc-800 rounded-lg overflow-hidden flex items-center justify-center text-muted-foreground">
                     <span className="text-sm tracking-wider uppercase opacity-50">Project Showcase / Image Placeholder</span>
                 </div>
             </div>
