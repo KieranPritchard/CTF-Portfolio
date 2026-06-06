@@ -30,7 +30,7 @@ function Welcome() {
                 </div>
 
                 {/* Image Container Box - Justified to the bottom */}
-                <div className="w-full max-w-4xl aspect-4/1 bg-zinc-800/50 border border-zinc-800 rounded-lg overflow-hidden flex items-center justify-center text-muted-foreground">
+                <div className="w-full max-w-4xl aspect-4/1 bg-zinc-800/50 border border-zinc-800 overflow-hidden flex items-center justify-center text-muted-foreground">
                     <span className="text-sm tracking-wider uppercase opacity-50">Project Showcase / Image Placeholder</span>
                 </div>
             </div>
