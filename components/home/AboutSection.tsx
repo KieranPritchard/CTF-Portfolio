@@ -1,5 +1,3 @@
-import React from 'react';
-
 export default function AboutSection() {
   return (
     <section className="min-h-screen relative overflow-hidden">
@@ -11,9 +9,15 @@ export default function AboutSection() {
           
           {/* About Me Section */}
           <div className="space-y-4">
-            <h2 className="text-3xl font-bold tracking-tight inline-block">
-              About Me
-            </h2>
+            <div>
+              <h2 className="text-3xl font-bold tracking-tight">
+                About Me
+              </h2>
+              
+              {/* Left-aligned decorative accent bar */}
+              <div className="h-1.5 w-24 bg-primary mt-4 rounded-full" />
+            </div>
+            
             <p className="leading-relaxed max-w-xl">
               I am a [Cybersecurity Student / Security Researcher / Application
               Security Analyst] dedicated to breaking systems down to understand
@@ -32,9 +36,15 @@ export default function AboutSection() {
 
           {/* Technical Arsenal Section */}
           <div className="space-y-4">
-            <h2 className="text-3xl font-bold tracking-tight inline-block">
-              Technical Arsenal
-            </h2>
+            <div>
+              <h2 className="text-3xl font-bold tracking-tight">
+                Technical Arsenal
+              </h2>
+
+              {/* Left-aligned decorative accent bar */}
+              <div className="h-1.5 w-24 bg-primary mt-4 rounded-full" />
+            </div>
+            
             <ul className="list-disc list-inside space-y-2 max-w-xl">
               <li>
                 <span className="font-semibold">Languages:</span> [e.g., Python, Bash, C, Go]
