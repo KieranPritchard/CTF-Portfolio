@@ -1,4 +1,4 @@
-import LinkButton from "../main-components/LinkButton";
+import LinkButton from "../Main/LinkButton";
 
 function Welcome() {
     return (
