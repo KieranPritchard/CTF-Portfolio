@@ -10,7 +10,7 @@ const navItems = [
 export function NavigationBar() {
     return (
         <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50">
-            <nav className="flex items-center gap-1 px-3 py-2 bg-background/80 border border-border rounded-full shadow-xl backdrop-blur-md">
+            <nav className="flex items-center gap-1 px-3 py-2 bg-background border border-border rounded-full shadow-xl">
                 {navItems.map((item) => (
                     <Link
                         key={item.href}
