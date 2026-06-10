@@ -11,3 +11,11 @@ export type ReportFrontmatter = {
     coverImage?: string
     coverAlt?: string
 }
+
+// Exports the project summary
+export type ReportSummary = ReportFrontmatter
+
+export type ReportDoc = ReportFrontmatter & {
+    /** The full markdown content of the project page. */
+    content: string
+}
