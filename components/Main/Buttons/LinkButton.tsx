@@ -1,4 +1,4 @@
-import { Button, buttonVariants } from "../ui/button"
+import { Button, buttonVariants } from "../../ui/button"
 import { VariantProps } from "class-variance-authority"
 
 // Define the interface extending shadcn's button variants
