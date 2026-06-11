@@ -8,8 +8,6 @@ export type ReportFrontmatter = {
     category: ReportCategory
     description: string
     date: string
-    coverImage?: string
-    coverAlt?: string
 }
 
 // Exports the project summary
