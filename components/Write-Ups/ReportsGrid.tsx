@@ -6,7 +6,49 @@ import { Card, CardContent, CardFooter, CardHeader } from "../ui/card"
 import { Badge } from "../ui/badge"
 import { cn } from "@/lib/utils"
 import type { ReportSummary } from "@/types/report"
-import { ArrowRight, Code, Shield, Zap, LayoutGrid, Square, List, Search, ChevronDown } from "lucide-react"
+import {
+    ArrowRight,
+    LayoutGrid,
+    Square,
+    List,
+    Search,
+    ChevronDown,
+    Shield,
+    Terminal,
+    KeyRound,
+    Unlock,
+    Database,
+    Eye,
+    Binary,
+    type LucideIcon,
+} from "lucide-react"
+
+/**
+ * Maps each project category to a representative icon.
+ * Used by `getCategoryIcon` to keep icon usage consistent
+ * across the grid and card view modes.
+ */
+const categoryIcons: Record<string, LucideIcon> = {
+    "web-application": Shield,
+    "linux": Terminal,
+    "windows": KeyRound,
+    "password-cracking": Unlock,
+    "database-exploitation": Database,
+    "osint": Eye,
+    "cryptography": Binary,
+}
+
+/**
+ * Resolves and renders the icon associated with a given project category.
+ * Falls back to the Shield icon if the category has no explicit mapping.
+ *
+ * @param category - The project's category string (e.g. "linux").
+ * @param className - Tailwind classes applied to the rendered icon.
+ */
+function getCategoryIcon(category: string, className: string) {
+    const Icon = categoryIcons[category] ?? Shield
+    return <Icon className={className} />
+}
 
 /**
  * ReportsGrid Component
@@ -115,13 +157,7 @@ export default function ReportsGrid({ className, reports }: Readonly<{ className
                             <Card className="group h-full flex flex-col border-border/50 hover:border-primary/50 transition-all">
                                 <CardHeader>
                                     <div className="p-2 w-fit rounded-lg bg-muted border border-border group-hover:border-primary/50 transition-colors">
-                                        {report.category === "web-application"  && <Shield className="h-5 w-5 text-primary" />}
-                                        {report.category === "linux" && <Code className="h-5 w-5 text-primary" />}
-                                        {report.category === "windows" && <Zap className="h-5 w-5 text-primary" />}
-                                        {report.category === "password-cracking" && <Zap className="h-5 w-5 text-primary" />}
-                                        {report.category === "database-exploitation" && <Zap className="h-5 w-5 text-primary" />}
-                                        {report.category === "osint" && <Zap className="h-5 w-5 text-primary" />}
-                                        {report.category === "cryptography" && <Zap className="h-5 w-5 text-primary" />}
+                                        {getCategoryIcon(report.category, "h-5 w-5 text-primary")}
                                     </div>
                                 </CardHeader>
                                 <CardContent className="flex-1">
@@ -141,13 +177,7 @@ export default function ReportsGrid({ className, reports }: Readonly<{ className
                         {viewMode === "card" && (
                             <div className="group flex flex-col md:flex-row gap-6 p-6 rounded-lg border border-border bg-card">
                                 <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-lg bg-muted border border-border">
-                                    {report.category === "web-application"  && <Shield className="h-6 w-6 text-primary" />}
-                                    {report.category === "linux" && <Code className="h-6 w-6 text-primary" />}
-                                    {report.category === "windows" && <Zap className="h-6 w-6 text-primary" />}
-                                    {report.category === "password-cracking" && <Zap className="h-6 w-6 text-primary" />}
-                                    {report.category === "database-exploitation" && <Zap className="h-6 w-6 text-primary" />}
-                                    {report.category === "osint" && <Zap className="h-6 w-6 text-primary" />}
-                                    {report.category === "cryptography" && <Zap className="h-6 w-6 text-primary" />}
+                                    {getCategoryIcon(report.category, "h-6 w-6 text-primary")}
                                 </div>
                                 <div className="flex-1 space-y-2">
                                     <div className="flex items-center justify-between">
