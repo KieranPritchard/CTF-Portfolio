@@ -6,7 +6,7 @@ import { Card, CardContent, CardFooter, CardHeader } from "../ui/card"
 import { Badge } from "../ui/badge"
 import { cn } from "@/lib/utils"
 import type { ReportSummary } from "@/types/report"
-import { ArrowRight, Code, Shield, Zap, LayoutGrid, Square, List, Search } from "lucide-react"
+import { ArrowRight, Code, Shield, Zap, LayoutGrid, Square, List, Search, ChevronDown } from "lucide-react"
 
 /**
  * ReportsGrid Component
@@ -55,21 +55,26 @@ export default function ReportsGrid({ className, reports }: Readonly<{ className
                 {/* Control Bar: Filter, Search, and View Toggles */}
                 <div className="rounded-xl border border-border bg-card p-4 space-y-4">
                     <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                        {/* Category Filter Buttons */}
-                        <div className="flex flex-wrap items-center gap-2">
-                            <span className="text-xs font-mono uppercase tracking-wider text-muted-foreground mr-2">Filter</span>
-                            {categories.map((cat) => (
-                                <button
-                                    key={cat}
-                                    onClick={() => setFilter(cat)}
-                                    className={cn(
-                                        "px-3 py-1 text-xs font-medium rounded-md transition-all",
-                                        filter === cat ? "bg-primary text-primary-foreground" : "hover:bg-muted text-muted-foreground"
-                                    )}
+                        {/* Category Filter Dropdown */}
+                        <div className="flex items-center gap-2 w-full md:w-auto">
+                            <span className="text-xs font-mono uppercase tracking-wider text-muted-foreground shrink-0">Filter</span>
+                            <div className="relative w-full md:w-auto">
+                                <select
+                                    value={filter}
+                                    onChange={(e) => setFilter(e.target.value)}
+                                    className="w-full md:w-auto appearance-none rounded-md border border-border bg-card py-1.5 pl-3 pr-8 text-xs font-medium outline-none focus:border-primary transition-colors cursor-pointer"
                                 >
-                                    {cat.charAt(0).toUpperCase() + cat.slice(1)} {cat === "all" ? `(${reports.length})` : `(${reports.filter(p => p.category === cat).length})`}
-                                </button>
-                            ))}
+                                    <option value="all">All ({reports.length})</option>
+                                    {categories.map((cat) => (
+                                        <option key={cat} value={cat}>
+                                            {cat.charAt(0).toUpperCase() + cat.slice(1)} ({reports.filter(p => p.category === cat).length})
+                                        </option>
+                                    ))}
+                                </select>
+                                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-muted-foreground">
+                                    <ChevronDown className="h-3 w-3" />
+                                </div>
+                            </div>
                         </div>
 
                         {/* Search Input Field */}
@@ -127,7 +132,7 @@ export default function ReportsGrid({ className, reports }: Readonly<{ className
                                     </div>
                                 </CardContent>
                                 <CardFooter className="pt-4 border-t border-border/50">
-                                    <Link href={`/portfolio/${report.slug}`} className="text-xs font-bold hover:underline">View Project</Link>
+                                    <Link href={`/write-ups/${report.slug}`} className="text-xs font-bold hover:underline">View Project</Link>
                                 </CardFooter>
                             </Card>
                         )}
@@ -151,7 +156,7 @@ export default function ReportsGrid({ className, reports }: Readonly<{ className
                                     </div>
                                     <h3 className="text-xl font-bold">{report.title}</h3>
                                     <p className="text-sm text-muted-foreground">{report.description}</p>
-                                    <Link href={`/portfolio/${report.slug}`} className="inline-flex items-center gap-2 text-sm font-bold text-primary hover:underline">
+                                    <Link href={`/write-ups/${report.slug}`} className="inline-flex items-center gap-2 text-sm font-bold text-primary hover:underline">
                                         Read full case study <ArrowRight className="h-3 w-3" />
                                     </Link>
                                 </div>
@@ -171,7 +176,7 @@ export default function ReportsGrid({ className, reports }: Readonly<{ className
                                 <div className="flex items-center gap-8 text-right">
                                     <span className="text-xs font-mono uppercase text-muted-foreground w-20">{report.category}</span>
                                     <span className="text-xs font-mono text-muted-foreground w-24">{report.date}</span>
-                                    <Link href={`/portfolio/${report.slug}`} className="text-primary hover:text-primary/80">
+                                    <Link href={`/write-ups/${report.slug}`} className="text-primary hover:text-primary/80">
                                         <ArrowRight className="h-4 w-4" />
                                     </Link>
                                 </div>
