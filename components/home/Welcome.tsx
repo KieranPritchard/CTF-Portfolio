@@ -72,7 +72,7 @@ function Welcome() {
 
                 {/* Image Container Box - Justified to the bottom */}
                 <motion.div 
-                    className="w-full max-w-4xl aspect-[4/1] bg-zinc-800/50 border border-zinc-800 overflow-hidden flex items-center justify-center text-muted-foreground"
+                    className="w-full max-w-4xl aspect-4/1 bg-zinc-800/50 border border-zinc-800 overflow-hidden flex items-center justify-center text-muted-foreground"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.5, duration: 0.7, ease: "circOut" }}
