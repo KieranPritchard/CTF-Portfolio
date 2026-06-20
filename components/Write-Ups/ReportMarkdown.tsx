@@ -4,6 +4,7 @@ import { Variants } from "framer-motion"
 import { motion } from "framer-motion"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
+import rehypeRaw from "rehype-raw"
 import Image from "next/image"
 import Link from "next/link"
 import {
@@ -15,6 +16,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { cn } from "@/lib/utils"
+import { MarkdownCarousel } from "@/components/Write-Ups/MarkdownCarousel"
 
 
 /**
@@ -39,17 +41,55 @@ const markdownItemVariants: Variants = {
  * 
  * @param children - The React elements to wrap with animation.
  */
-const FadeUpObserver = ({ children }: { children: React.ReactNode }) => {
+const FadeUpObserver = ({ children, as = "div", className }: { children: React.ReactNode, as?: "div" | "span", className?: string }) => {
+  const Component = motion[as]
   return (
-    <motion.div
+    <Component
       variants={markdownItemVariants}
       initial="hidden"
       whileInView="visible"
-      viewport={{ once: true, margin: "-100px 0px" }} // Triggers slightly before element enters visible screen
+      viewport={{ once: true, margin: "-100px 0px" }}
+      className={className}
     >
       {children}
-    </motion.div>
+    </Component>
   )
+}
+
+/**
+ * Pre-processes the raw markdown string.
+ * Extracts image src paths from <carousel>...</carousel> blocks,
+ * removes the carousel block from the markdown body,
+ * and returns both separately so they can be rendered as distinct React elements.
+ */
+function extractCarousel(content: string): { body: string; imageSrcs: string[] } {
+  const carouselRegex = /<carousel>([\s\S]*?)<\/carousel>/i
+  const match = content.match(carouselRegex)
+
+  if (!match) {
+    return { body: content, imageSrcs: [] }
+  }
+
+  const block = match[1]
+  const imageSrcs: string[] = []
+
+  // Handle HTML <img src="..."> syntax
+  const imgTagRegex = /src="([^"]+)"/gi
+  let m
+  while ((m = imgTagRegex.exec(block)) !== null) {
+    imageSrcs.push(m[1])
+  }
+
+  // Handle markdown image syntax ![alt](path)
+  const mdImageRegex = /!\[[^\]]*\]\(([^)]+)\)/gi
+  while ((m = mdImageRegex.exec(block)) !== null) {
+    imageSrcs.push(m[1])
+  }
+
+  // Remove the carousel block from the markdown body
+  const body = content.replace(carouselRegex, "").trimEnd()
+
+  return { body, imageSrcs }
 }
 
 /**
@@ -62,37 +102,40 @@ const FadeUpObserver = ({ children }: { children: React.ReactNode }) => {
  * @param content - The raw markdown string to render.
  */
 export function ReportMarkdown({ content }: Readonly<{ content: string }>) {
+  const { body, imageSrcs } = extractCarousel(content)
+
   return (
     <article className="min-w-0">
       {/* Markdown Parser: Overrides default HTML tags with custom styled React components */}
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
+        rehypePlugins={[rehypeRaw]}
         components={{
           // Typography: All headers and paragraphs wrapped in FadeUpObserver for scroll animations
           h1: ({ children, ...props }) => (
-            <FadeUpObserver>
-              <h2 className="mt-12 scroll-m-20 font-heading text-2xl font-bold tracking-tight text-foreground first:mt-0" {...props}>
+            <FadeUpObserver className="mt-12 first:mt-0">
+              <h2 className="scroll-m-20 font-heading text-2xl font-bold tracking-tight text-foreground" {...props}>
                 {children}
               </h2>
             </FadeUpObserver>
           ),
           h2: ({ children, ...props }) => (
-            <FadeUpObserver>
-              <h3 className="mt-10 scroll-m-20 font-heading text-xl font-bold tracking-tight text-foreground/95" {...props}>
+            <FadeUpObserver className="mt-10">
+              <h3 className="scroll-m-20 font-heading text-xl font-bold tracking-tight text-foreground/95" {...props}>
                 {children}
               </h3>
             </FadeUpObserver>
           ),
           h3: ({ children, ...props }) => (
-            <FadeUpObserver>
-              <h4 className="mt-8 scroll-m-20 font-heading text-lg font-semibold tracking-tight text-foreground/90" {...props}>
+            <FadeUpObserver className="mt-8">
+              <h4 className="scroll-m-20 font-heading text-lg font-semibold tracking-tight text-foreground/90" {...props}>
                 {children}
               </h4>
             </FadeUpObserver>
           ),
           p: ({ children, ...props }) => (
-            <FadeUpObserver>
-              <p className="leading-relaxed text-foreground/90 not-first:mt-6" {...props}>
+            <FadeUpObserver className="mt-5">
+              <p className="leading-relaxed text-foreground/90" {...props}>
                 {children}
               </p>
             </FadeUpObserver>
@@ -123,10 +166,9 @@ export function ReportMarkdown({ content }: Readonly<{ content: string }>) {
             }
 
             if (src.startsWith("/")) {
-              // Optimized local images using next/image
               return (
-                <FadeUpObserver>
-                  <span className="my-10 block overflow-hidden rounded-xl border bg-muted/20 shadow-xl shadow-primary/5">
+                <FadeUpObserver as="span" className="my-10 block">
+                  <span className="block overflow-hidden rounded-xl border bg-muted/20 shadow-xl shadow-primary/5">
                     <Image
                       src={src}
                       alt={alt ?? ""}
@@ -134,20 +176,19 @@ export function ReportMarkdown({ content }: Readonly<{ content: string }>) {
                       height={675}
                       className="h-auto w-full object-cover transition-transform duration-700 hover:scale-105"
                       sizes="(max-width: 1024px) 100vw, 896px"
-                      priority={false} // Allow lazy loading for content images
+                      priority={false}
                     />
                   </span>
                 </FadeUpObserver>
               )
             }
 
-            // Standard img tag for external resources
             return (
-              <FadeUpObserver>
+              <FadeUpObserver as="span" className="my-10 block">
                 <img
                   src={src}
                   alt={alt ?? ""}
-                  className="my-10 w-full rounded-xl border bg-muted/20 object-cover shadow-xl shadow-primary/5"
+                  className="w-full rounded-xl border bg-muted/20 object-cover shadow-xl shadow-primary/5"
                   loading="lazy"
                 />
               </FadeUpObserver>
@@ -191,7 +232,6 @@ export function ReportMarkdown({ content }: Readonly<{ content: string }>) {
               <hr className="my-12 border-border/50" />
             </FadeUpObserver>
           ),
-          // Lists: Styled bullet and numbered lists with primary-colored markers
           ul: ({ children, ...props }) => (
             <FadeUpObserver>
               <ul className="my-6 list-disc space-y-3 pl-6 text-foreground/90 marker:text-primary/70" {...props}>
@@ -209,8 +249,13 @@ export function ReportMarkdown({ content }: Readonly<{ content: string }>) {
           li: ({ children, ...props }) => <li className="leading-relaxed" {...props}>{children}</li>,
         }}
       >
-        {content}
+        {body}
       </ReactMarkdown>
+
+      {/* Render the screenshot carousel directly as a React component with the extracted src paths */}
+      {imageSrcs.length > 0 && (
+        <MarkdownCarousel srcs={imageSrcs} />
+      )}
     </article>
   )
 }
