@@ -6,15 +6,11 @@ description: "Not the hacking group"
 date: "2025-01-31"
 ---
 
-#  Challenge Description
+# Challenge Description
 
 Not the hacking group
 
-# ️ Files Provided
-
-None
-
-#  Challenge Setup
+# Challenge Setup
 
 ## Tools Used:
 - nmap — port scanning & service/version enumeration
@@ -25,9 +21,10 @@ None
 - PentestMonkey reverse-shell cheat sheet
 
 ## Environment:
+
 TryHackMe virtual machine (via VPN connection)
 
-#  Initial Recon
+# Initial Recon
 
 I deployed the machine to obtain the target IP, then ran nmap to identify open services. The scan showed:
 
@@ -38,10 +35,10 @@ I deployed the machine to obtain the target IP, then ran nmap to identify open s
 
 A version scan confirmed SMB-related services on 139/445. 
 
-
-# ️ Exploitation / Solution
+# ️Exploitation / Solution
 
 ## Step One — FTP Enumeration
+
 - Connected to FTP and tried the common anonymous login: username: anonymous, password: password. The login succeeded.
 - In the FTP root there was a folder “scripts” containing:
   - clean.sh — cleanup script
@@ -63,12 +60,12 @@ Step Three — Privilege Escalation
 - Used the GTFOBins technique to spawn a root shell: `./env /bin/sh -p`
 - With the root shell, read the root flag in /root.
 
-#  Flag
+# Flag
 
 > User Flag: 90d6f992585815ff991e68748c414740
 > Root Flag: 4d930091c31a622a7ed10f27999af363
 
-#  Tools Used
+# Tools Used
 
 - nmap
 - ftp / lftp (optional)
@@ -77,13 +74,13 @@ Step Three — Privilege Escalation
 - GTFOBins (https://gtfobins.github.io)
 - PentestMonkey reverse shell cheat sheet (http://pentestmonkey.net/cheat-sheet/shells/reverse-shell-cheat-sheet)
 
-#  Notes / Lessons Learned
+# Notes / Lessons Learned
 
 - File timestamps and logs often reveal scheduled tasks (cron jobs).
 - When a script is run by a scheduled task, modifying that script can allow command execution (if you have write access).
 - I got stuck initially but referencing a write-up pointed me towards PentestMonkey reverse shells, which are now a go-to resource.
 
-#  Screenshots
+# Screenshots
 
 <img src="/images/anonymous/Anoymous_Screenshot_1.png">
 <img src="/images/anonymous/Anoymous_Screenshot_2.png">

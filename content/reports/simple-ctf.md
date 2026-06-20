@@ -6,17 +6,9 @@ description: "Beginner level ctf"
 date: "2025-09-22"
 ---
 
-#  Challenge Description
+# Challenge Setup
 
-Beginner level ctf
-
-# ️ Files Provided
-
-None other then the machine
-
-#  Challenge Setup
-
-## **Tools Used:**
+## Tools Used:
 
 - **nmap** — For network reconnaissance and port scanning
 - **gobuster** — To brute-force web directories
@@ -25,15 +17,15 @@ None other then the machine
 - **SSH** — To remotely access the target machine
 - **gtfobins** — To find privilege escalation techniques
 
-## **Environment:**
+## Environment:
 
 - Kali linux virtual machine
 
-#  Initial Recon
+# Initial Recon
 
 I first scanned for services and open ports on the IP address with nmap. i then found three services on the network: port 21 uses FTP; port 80 uses HTTP (meaning there is a website); and port 2222 uses SSH to allow for remote sign on. I followed this up with gobuster to see what web pages I can access. I found a page called simple, I found this using a wordlist called: “directory-list-2-3-medium-txt”.
 
-# ️ Exploitation / Solution
+# ️Exploitation / Solution
 
 ## 1. Exploitation
 
@@ -57,13 +49,13 @@ I first scanned for services and open ports on the IP address with nmap. i then 
 - I then went on gtfoblins and found a vim payload.
 - gained sudo privileges and found root file flag and completed challenge
 
-#  Flag
+# Flag
 
 ```
 W3ll d0n3. You made it!
 ```
 
-#  Tools Used
+# Tools Used
 
 - **nmap** — Port scanning and service enumeration
 - **gobuster** — Directory brute-forcing
@@ -72,7 +64,7 @@ W3ll d0n3. You made it!
 - **SSH** — Remote shell access
 - **gtfobins** — Privilege escalation techniques
 
-#  Notes / Lessons Learned
+# Notes / Lessons Learned
 
 - Always check for version info in footers — it’s often an easy path to exploitation.
 - Don’t ignore non-standard SSH ports (e.g., 2222).

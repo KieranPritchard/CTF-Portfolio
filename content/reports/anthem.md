@@ -6,27 +6,19 @@ description: "Exploit a Windows machine in this beginner-level challenge."
 date: "2025-02-26"
 ---
 
-#  Challenge Description
+# Challenge Setup
 
-Exploit a Windows machine in this beginner-level challenge.
-
-# ️ Files Provided
-
-None
-
-#  Challenge Setup
-
-## **Tools Used:**
+## Tools Used:
 
 - **Nmap** — Network scanning to find open ports and services.
 - **Gobuster** — Directory brute-forcing to find hidden paths.
 - **Remmina** — RDP client to connect to the target’s desktop.
 
-## **Environment:**
+## Environment:
 
 - **TryHackMe hosted VM** — Accessed through the provided IP address.
 
-#  Initial Recon
+# Initial Recon
 
 I started the TryHackMe machine and performed an `nmap` scan:
 
@@ -40,7 +32,7 @@ Using `gobuster`, I discovered several interesting directories:
 
 These immediately hinted at potential information disclosure and CMS exploitation opportunities.
 
-# ️ Exploitation / Solution
+# Exploitation / Solution
 
 ## 1. First Set of Tasks
 
@@ -65,7 +57,7 @@ These immediately hinted at potential information disclosure and CMS exploitatio
 - Inside was the **Administrator password**.
 - Logged in via RDP as **Administrator**, navigated to the desktop, and retrieved the **root flag**.
 
-#  Flags
+# Flags
 
 ```
 THM{L0L_WH0_US3S_M3T4}
@@ -76,20 +68,20 @@ THM{N00T_NO0T}
 THM{Y0U_4R3_1337}
 ```
 
-#  Tools Used
+# Tools Used
 
 - **Nmap** — Port scanning and service enumeration.
 - **Gobuster** — Directory brute-forcing for hidden pages.
 - **Remmina** — RDP access to the Windows desktop.
 
-#  Notes / Lessons Learned
+# Notes / Lessons Learned
 
 - Always check `/robots.txt` — it can leak sensitive information like passwords.
 - Poems, text, and other “fluff” content may be clues for usernames.
 - Adjusting file permissions can be a quick privilege escalation method in misconfigured Windows systems.
 - Even if a CMS login fails, credentials may still be valid for other services.
 
-#  Screenshots
+# Screenshots
 
 <img src="/images/anthem/Anthem_Screenshot_1.png">
 <img src="/images/anthem/Anthem_Screenshot_2.png">

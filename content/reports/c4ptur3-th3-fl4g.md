@@ -6,33 +6,29 @@ description: "A beginner level CTF challenge"
 date: "2025-11-13"
 ---
 
-#  Challenge Description
+# Challenge Setup
 
-A beginner level CTF challenge
-
-# ️ Files Provided
+## ️Files Provided
 
 - Audio files to analyse with spectrograms
 - Photos to analyse for stegnograph
 
-#  Challenge Setup
-
-## **Tools Used:**
+## Tools Used:
 
 - CyberChef — for decoding binary, base encodings, and ciphers
 - Inspectrum / Online Spectrogram Tool — for analyzing audio waveforms
 - StegOnline / StegSolve — for extracting hidden data from images
 
-## **Environment:**
+## Environment:
 
 - TryHackMe virtual room with downloadable challenge resources
 - Local Kali Linux VM used for file analysis
 
-#  Initial Recon
+# Initial Recon
 
 I first logged into the page to find four sections: “Translation & Shifting”; “Spectrograms”; “Steganography”; and “Security through obscurity”. The later three files then have downloadable files to complete the tasks, these are specific to the section of the challenge.
 
-# ️ Exploitation / Solution
+# ️Exploitation / Solution
 
 ## 1. Section one: Translation & Shifting
 
@@ -117,7 +113,7 @@ I first logged into the page to find four sections: “Translation & Shifting”
     - One was a filename: `hackerchat.png`
     - The other, a flag: `AHH_YOU_FOUND_ME!`
 
-#  Flag
+# Flag
 
 ```
 Flag 1: can you capture the flag  
@@ -135,20 +131,18 @@ Flag 12: SpaghettiSteg
 Flag 13: AHH_YOU_FOUND_ME!
 ```
 
-#  Tools Used
+# Tools Used
 
 - **CyberChef** — Decoding binary, hex, base encodings, ciphers
 - **Online Spectrogram Tool** — Audio analysis for hidden messages
 - **StegOnline / StegSolve** — Image steganography tools
 - **Linux Terminal (cat command)** — Extracting hidden text after EOF in image files
 
-#  Notes / Lessons Learned
+# Notes / Lessons Learned
 
-- Spectrograms are a powerful way to hide plain-text in audio — great to recognize that visual format.
+- Spectrograms are a powerful way to hide plain-text in audio great to recognize that visual format.
 - Always inspect all aspects of a file — headers, metadata, and content *after* EOF can hide useful info.
 - Steganography isn’t just visual — it can be hidden in noise, pixel values, or metadata.
-
-
 
 <carousel>
 ![Screenshot of the challenge soloution](/images/c4ptur3-th3-fl4g/c4ptur3_th3_fl4g_1.png)

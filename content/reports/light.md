@@ -2,37 +2,33 @@
 title: "Light"
 slug: "light"
 category: "database-exploitation"
-description: "Light is a beginner-friendly room on TryHackMe that introduces users to basic SQL injection techniques. Through a simple login challenge, you'll explore how improper input handling can expose vulnerab"
+description: "Light is a beginner-friendly room on TryHackMe that introduces users to basic SQL injection techniques. Through a simple login challenge, you'll explore how improper input handling can expose vulnerabilities in web applications. Great for those starting out in web exploitation!"
 date: "2025-06-10"
 ---
 
-#  Challenge Description
+# Challenge Setup
 
-Light is a beginner-friendly room on TryHackMe that introduces users to basic SQL injection techniques. Through a simple login challenge, you'll explore how improper input handling can expose vulnerabilities in web applications. Great for those starting out in web exploitation!
-
-# ️ Files Provided
+## ️Files Provided
 
 - **Port:** 1337
 - **Username:** smokey
 
-#  Challenge Setup
-
-## **Tools Used:**
+## Tools Used:
 
 - nmap (port scanning)
 - netcat (connecting to service)
 - john the ripper (password cracking)
 - CyberChef (decoding attempts)
 
-## **Environment:**
+## Environment:
 
 - Local Kali Linux VM and THM target machine.
 
-#  Initial Recon
+# Initial Recon
 
 Before starting the challenge, I was given the machine's IP address, the service port (1337), and a username (smokey). I scanned the IP address with `nmap` to check for any other services — only SSH was found, which wasn’t needed for this challenge. After that, I connected directly to the service using `netcat`, and found a login prompt.
 
-# ️ Exploitation / Solution
+# ️Exploitation / Solution
 
 ## 1. First Login
 
@@ -67,12 +63,11 @@ Before starting the challenge, I was given the machine's IP address, the service
 - I found an `id` column and retrieved its data.
 - I made a query to filter the password table based on the `id`, which finally revealed the complete password for `smokey` and allowed me to get the final flag.
 
-#  Flag
+# Flag
 
 > THM{SQLit3_InJ3cTion_is_SimplE_nO?}
-> 
 
-#  Tools Used
+# Tools Used
 
 - **nmap** — Scanned IP address to discover open ports/services.
 - **netcat** — Connected to the service manually.
@@ -80,14 +75,12 @@ Before starting the challenge, I was given the machine's IP address, the service
 - **CyberChef** — Attempted various decoding methods.
 - **SQL Injection payload lists** — Helped craft injections.
 
-#  Notes / Lessons Learned
+# Notes / Lessons Learned
 
 - SQL Injection requires creativity, especially when the environment restricts certain characters.
 - It's good practice to save any outputs like hashes or encoded data immediately into a file.
 - Testing payloads manually teaches a lot more than just copy-pasting.
 - Always explore the database structure (information schema) carefully if you have injection access.
-
-
 
 <carousel>
 ![Screenshot of the challenge soloution](/images/light/Light_Screenshot_1.png)

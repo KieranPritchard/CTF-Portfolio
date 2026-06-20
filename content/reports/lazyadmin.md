@@ -6,24 +6,18 @@ description: "Exploit a misconfigured web application to gain access to the targ
 date: "2025-05-15"
 ---
 
-#  Challenge Description
-Exploit a misconfigured web application to gain access to the target, escalate privileges, and capture the flags.
+# Challenge Setup
 
-# ️ Files Provided
-
-None
-
-#  Challenge Setup
-
-### Tools Used:
+## Tools Used:
 - Nmap — Port scanning and service enumeration.
 - Gobuster — Directory brute-forcing to discover hidden files/folders.
 - CrackStation — Online hash cracking to recover plaintext passwords.
-### Environment:
+
+## Environment:
 
 TryHackMe hosted VM — Accessed via the provided IP address.
 
-###  Initial Recon
+# Initial Recon
 Started the target machine on TryHackMe.
 Ran an nmap service scan and found:
 - Port 22/tcp — OpenSSH
@@ -31,7 +25,8 @@ Ran an nmap service scan and found:
 Visited the site in a browser — a simple default Apache welcome page was displayed. 
 Ran gobuster against the IP and found a directory named /content. Navigated to /content and discovered a page for a CMS called SweetRice.
 
-# ️ Exploitation / Solution
+# ️Exploitation / Solution
+
 ## 1. Enumerating SweetRice
 
 Ran gobuster again on /content and discovered 6 different subpaths.

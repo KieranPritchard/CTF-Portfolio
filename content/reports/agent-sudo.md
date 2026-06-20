@@ -1,22 +1,14 @@
 ---
 title: "Agent Sudo"
 slug: "agent-sudo"
-category: "web-application"
+category: "windows"
 description: "Exploit a Windows machine in this beginner level challenge."
 date: "2025-01-05"
 ---
 
-#  Challenge Description
+# Challenge Setup
 
-Exploit a Windows machine in this beginner level challenge.
-
-# ️ Files Provided
-
-None
-
-#  Challenge Setup
-
-## **Tools Used:**
+## Tools Used:
 
 - **Nmap** — Port scanning & service enumeration
 - **Gobuster** — Directory enumeration
@@ -26,16 +18,16 @@ None
 - **John the Ripper** — Cracking password-protected archives
 - **scp** — Securely copying files from remote host to local machine
 
-## **Environment:**
+## Environment:
 
 - TryHackMe hosted target machine
 - Kali Linux (attacker machine)
 
-#  Initial Recon
+# Initial Recon
 
 I first deployed the machine to get the IP address that i then scanned and found three services running on them. I found on the IP address: FTP on port 21; SSH on port 22; and apache on port 80.
 
-# ️ Exploitation / Solution
+# ️Exploitation / Solution
 
 ## 1. First Look Through The Website
 
@@ -56,14 +48,14 @@ The text file I downloaded referenced steganography being used to hide something
 I used the credentials to sign into SSH and easily found the user flag. I noticed a photo file. I used secure copy to transfer the photo to my Kali Linux virtual machine. I opened it and found it was a photo of the Roswell alien autospy.
 I listed the sudo privileges and first checked gtfoblins, but they didn’t have anything I could use. I then found an exploit on exploit-db that I could use under CVE-2019-14287. I used the exploit to get root privileges and then found the root flag.
 
-#  Flag
+# Flag
 
 ```
 User Flag: b03d975e8c92a7c04146cfa7a5a313c7
 Root Flag: b53a02f55b57d4439e3341834d70c062
 ```
 
-#  Tools Used
+# Tools Used
 
 - **Nmap** — Network scanning and service enumeration
 - **Gobuster** — Directory brute forcing
@@ -74,7 +66,7 @@ Root Flag: b53a02f55b57d4439e3341834d70c062
 - **scp** — Transferring files securely
 - **Exploit-DB** — Finding privilege escalation exploits
 
-#  Notes / Lessons Learned
+# Notes / Lessons Learned
 
 - Always check HTTP headers — sometimes the key is hidden in plain sight.
 - Steganography is a common technique in CTFs; always inspect images for hidden files.

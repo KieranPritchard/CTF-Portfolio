@@ -6,33 +6,25 @@ description: "This challenge focused on cracking different types of password has
 date: "2025-04-19"
 ---
 
-#  Challenge Description
+# Challenge Setup
 
-This challenge focused on cracking different types of password hashes, using a variety of techniques and tools.
-
-# ️ Files Provided
-
-No additional files provided, only the hashes were given within the questions.
-
-#  Challenge Setup
-
-## **Tools Used:**
+## Tools Used:
 
 - hashid — Used for identifying hash types
 - Hashcat — Used for cracking hashes
 - John the Ripper — Used for cracking hashes
 - CrackStation — Online tool for cracking simple hashes
 
-## **Environment:**
+## Environment:
 
 - Local Kali Linux Virtual Machine
 - TryHackMe Platform
 
-#  Initial Recon
+# Initial Recon
 
 There wasn't any machines to scan over or enumerate but there was alot of questions with the hashes needed to complete the challenge. there are two sections one with nothing but questions and one that mentions about the hashes being in the rock you wordlist. I then went straight into it.
 
-# ️ Exploitation / Solution
+# ️Exploitation / Solution
 
 ## 1. Section 1 Of Challenge
 
@@ -54,20 +46,20 @@ There wasn't any machines to scan over or enumerate but there was alot of questi
 
 For salted hashes, additional research into specific cracking modes and salt usage was necessary.
 
-#  Flag
+# Flag
 
 ```
 No flags were provided in this challenge.
 ```
 
-#  Tools Used
+# Tools Used
 
 - hashid — Hash type identification
 - Hashcat — Brute force and dictionary attacks
 - John the Ripper — Wordlist attacks (rockyou.txt)
 - CrackStation — Online hash cracking for simple hashes
 
-#  Notes / Lessons Learned
+# Notes / Lessons Learned
 
 - Gained practical experience with hash identification and different hash types.
 - Learned the basic usage and syntax of Hashcat and John the Ripper.

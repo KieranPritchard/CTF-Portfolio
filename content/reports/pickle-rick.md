@@ -6,17 +6,9 @@ description: "A fun Rick and Morty–themed CTF where the objective is to collec
 date: "2025-08-01"
 ---
 
-#  Challenge Description
+# Challenge Setup
 
-A fun **Rick and Morty**–themed CTF where the objective is to collect **three secret ingredients** to help turn Rick back into a human.
-
-# ️ Files Provided
-
-None
-
-#  Challenge Setup
-
-## **Tools Used:**
+## Tools Used:
 
 * **Nmap** — For initial host discovery, port scanning, and service enumeration.
 * **Gobuster** — Directory and file brute forcing.
@@ -25,19 +17,19 @@ None
 * **sudo** — Used to escalate privileges due to misconfigurations.
 * **Linux CLI Utilities** (`tac`, `ls`, `sudo -l`, etc.) — Navigating the filesystem and reading files when primary commands were blocked.
 
-## **Environment:**
+## Environment:
 
 - TryHackMe hosted target machine
 - Kali Linux (attacker machine)
 
-#  Initial Recon
+# Initial Recon
 
 After deploying the machine and obtaining the target IP, I performed an **Nmap** scan. The scan revealed two open services:
 
 * **SSH** on port `22`
 * **Apache Web Server** on port `80`
 
-# ️ Exploitation / Solution
+# ️Exploitation / Solution
 
 ## 1. Initial Enumeration
 
@@ -78,7 +70,7 @@ Finally, leveraging my sudo permissions, I accessed the "/root" directory and ob
 
 After retrieving all three ingredients, the challenge was successfully completed.
 
-#  Flag
+# Flag
 
 ```
 Flag One: mr. meeseek hair
@@ -86,7 +78,7 @@ Flag Two: 1 jerry tear
 Flag Three: fleeb juice
 ```
 
-#  Tools Used
+# Tools Used
 
 * **Nmap** — For initial host discovery, port scanning, and service enumeration.
 * **Gobuster** — Directory and file brute forcing.
@@ -95,7 +87,7 @@ Flag Three: fleeb juice
 * **sudo** — Used to escalate privileges due to misconfigurations.
 * **Linux CLI Utilities** (`tac`, `ls`, `sudo -l`, etc.) — Navigating the filesystem and reading files when primary commands were blocked.
 
-#  Notes / Lessons Learned
+# Notes / Lessons Learned
 
 - If a command is blocked, try alternatives—utilities like tac, head, or less can bypass restrictions.
 - Inspect everything: page source, comments, and simple files often contain direct hints.

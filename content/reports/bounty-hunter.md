@@ -6,17 +6,9 @@ description: "You talked a big game about being the most elite hacker in the sol
 date: "2025-10-18"
 ---
 
-#  Challenge Description
+# Challenge Setup
 
-You talked a big game about being the most elite hacker in the solar system. Prove it and claim your right to the status of Elite Bounty Hacker!
-
-# ️ Files Provided
-
-No files were provided.
-
-#  Challenge Setup
-
-## **Tools Used:**
+## Tools Used:
 
 - **nmap** — Port scanning and service detection
 - **gobuster** — Directory brute-forcing on the web server
@@ -24,15 +16,15 @@ No files were provided.
 - **ftp / ssh** — File access and remote login
 - **GTFOBins** — Privilege escalation reference
 
-## **Environment:**
+## Environment:
 
 - Local Kali linux virtual machine.
 
-#  Initial Recon
+# Initial Recon
 
 Firstly, I scanned for services with nmap. doing this found three services: ftp on port 21; ssh on port 20; and http on port 80.
 
-# ️ Exploitation / Solution
+# ️Exploitation / Solution
 
 ## 1. Exploration
 
@@ -54,14 +46,14 @@ Firstly, I scanned for services with nmap. doing this found three services: ftp 
 - Used command to escalate privalges and gain root.
 - found the user flag and navigated to root to find the root flag.
 
-#  Flag
+# Flag
 
 ```
 THM{CR1M3_SyNd1C4T3}
 THM{80UN7Y_h4cK3r}
 ```
 
-#  Tools Used
+# Tools Used
 
 - **nmap** — Discovered open ports and running services
 - **gobuster** — Enumerated hidden web directories
@@ -69,14 +61,12 @@ THM{80UN7Y_h4cK3r}
 - **ftp/ssh** — Connected to services and navigated the file system
 - **GTFOBins** — Found privilege escalation vectors
 
-#  Notes / Lessons Learned
+# Notes / Lessons Learned
 
 - Anonymous FTP access can expose sensitive information.
 - Always check for reused usernames in file contents — they often become SSH usernames.
 - Directory brute-forcing is essential when a website has little to no navigation.
 - GTFOBins is a key resource for privilege escalation when you have limited sudo rights.
-
-
 
 <carousel>
 ![Screenshot of the challenge soloution](/images/bounty-hunter/Bounty_Hunter_Screenshot_1.png)
