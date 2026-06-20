@@ -203,9 +203,9 @@ export default function ReportsGrid({ className, reports }: Readonly<{ className
                                         <p className="text-sm text-muted-foreground hidden sm:block">{report.description.substring(0, 80)}...</p>
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-8 text-right">
-                                    <span className="text-xs font-mono uppercase text-muted-foreground w-20">{report.category}</span>
-                                    <span className="text-xs font-mono text-muted-foreground w-24">{report.date}</span>
+                                <div className="flex items-center gap-4 sm:gap-8 text-right">
+                                    <span className="hidden sm:inline-block text-xs font-mono uppercase text-muted-foreground w-20">{report.category}</span>
+                                    <span className="hidden sm:inline-block text-xs font-mono text-muted-foreground w-24">{report.date}</span>
                                     <Link href={`/write-ups/${report.slug}`} className="text-primary hover:text-primary/80">
                                         <ArrowRight className="h-4 w-4" />
                                     </Link>

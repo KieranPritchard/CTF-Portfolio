@@ -47,8 +47,8 @@ export default async function Page({ params }: Readonly<{ params: Promise<{ slug
     const { content, ...summary } = report;
 
     return (
-        // py-12 provides clearance below the fixed NavigationBar in the root layout
-        <div className="mx-auto w-full max-w-3xl px-4 pt-24 sm:pt-28 pb-20 md:px-6 lg:px-8">
+        // pt-24 pb-20 provides clearance below the fixed NavigationBar in the root layout
+        <div className="mx-auto w-full max-w-3xl px-4 pt-24 pb-20 md:px-6 lg:px-8">
             {/* Breadcrumbs */}
             <ReportBreadcrumbs
                 className="mb-8"
