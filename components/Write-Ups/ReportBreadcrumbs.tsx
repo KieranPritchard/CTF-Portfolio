@@ -1,3 +1,7 @@
+/**
+ * Breadcrumb navigation trail for hierarchical pages.
+ * Used on write-up detail pages to link back to the listing.
+ */
 import Link from "next/link"
 import { ChevronRight } from "lucide-react"
 import { cn } from "@/lib/utils"

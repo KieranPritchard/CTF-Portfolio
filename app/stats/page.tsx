@@ -60,10 +60,10 @@ export default function StatsPage() {
     return (
         <div className="mx-auto w-full max-w-5xl px-4 pt-28 sm:pt-32 pb-24 md:px-6 lg:px-8 space-y-16">
             <header className="space-y-4">
-                <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-foreground">
+                <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-gradient-brand">
                     Metrics &amp; Stats
                 </h1>
-                <div className="h-1.5 w-24 bg-primary rounded-full" />
+                <div className="h-1.5 w-24 gradient-accent rounded-full" />
                 <p className="text-muted-foreground text-lg max-w-2xl">
                     A quantitative look at my research, CTF participation, and write-ups over time.
                 </p>

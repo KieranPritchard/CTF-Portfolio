@@ -1,3 +1,7 @@
+/**
+ * shadcn/ui Carousel primitive.
+ * Embla-powered scrollable carousel with previous/next navigation buttons.
+ */
 "use client"
 
 import * as React from "react"

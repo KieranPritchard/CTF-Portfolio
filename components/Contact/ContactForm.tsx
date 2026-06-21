@@ -1,3 +1,7 @@
+/**
+ * Contact page form with social links and a simulated message submission flow.
+ * Shows a success state after the user submits the form.
+ */
 "use client"
 
 import { useState } from "react"
@@ -41,16 +45,16 @@ export function ContactForm() {
                 </div>
 
                 <div className="space-y-4">
-                    <a href="mailto:hello@example.com" className="flex items-center gap-4 p-4 rounded-xl border border-border bg-card hover:bg-muted/50 hover:border-primary/50 transition-all group">
+                    <a href="mailto:KieranPritchard06@gmail.com" className="flex items-center gap-4 p-4 rounded-xl border border-border bg-card hover:bg-muted/50 hover:border-primary/50 transition-all group">
                         <div className="h-10 w-10 rounded-full bg-primary/10 text-primary flex items-center justify-center group-hover:scale-110 transition-transform">
                             <Mail className="h-5 w-5" />
                         </div>
                         <div>
                             <p className="font-medium">Email</p>
-                            <p className="text-sm text-muted-foreground">hello@example.com</p>
+                            <p className="text-sm text-muted-foreground">KieranPritchard06@gmail.com</p>
                         </div>
                     </a>
-                    <a href="https://github.com" target="_blank" rel="noreferrer" className="flex items-center gap-4 p-4 rounded-xl border border-border bg-card hover:bg-muted/50 hover:border-primary/50 transition-all group">
+                    <a href="https://github.com/KieranPritchard" target="_blank" rel="noreferrer" className="flex items-center gap-4 p-4 rounded-xl border border-border bg-card hover:bg-muted/50 hover:border-primary/50 transition-all group">
                         <div className="h-10 w-10 rounded-full bg-primary/10 text-primary flex items-center justify-center group-hover:scale-110 transition-transform">
                             <FaGithub className="h-5 w-5" />
                         </div>
@@ -59,7 +63,7 @@ export function ContactForm() {
                             <p className="text-sm text-muted-foreground">Check out my tools &amp; scripts</p>
                         </div>
                     </a>
-                    <a href="https://linkedin.com" target="_blank" rel="noreferrer" className="flex items-center gap-4 p-4 rounded-xl border border-border bg-card hover:bg-muted/50 hover:border-primary/50 transition-all group">
+                    <a href="https://www.linkedin.com/feed/" target="_blank" rel="noreferrer" className="flex items-center gap-4 p-4 rounded-xl border border-border bg-card hover:bg-muted/50 hover:border-primary/50 transition-all group">
                         <div className="h-10 w-10 rounded-full bg-primary/10 text-primary flex items-center justify-center group-hover:scale-110 transition-transform">
                             <FaLinkedin className="h-5 w-5" />
                         </div>

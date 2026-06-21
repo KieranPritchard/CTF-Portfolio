@@ -1,8 +1,12 @@
+/**
+ * Hero header for individual write-up pages.
+ * Displays the title, date, category badge, description, and optional cover image.
+ */
 "use client"
 
 import { Variants, motion } from "framer-motion"
 import Image from "next/image"
-import { Badge } from "@/components/ui/badge"
+import { CategoryBadge } from "@/components/shared/CategoryBadge"
 import type { ReportSummary } from "@/types/report"
 import { cn } from "@/lib/utils"
 
@@ -59,7 +63,7 @@ export function ReportArticleHeader({
         <div className="space-y-4">
           {/* Branded Label */}
           <motion.p 
-            className="text-xs font-mono uppercase tracking-widest text-primary"
+            className="text-xs font-mono uppercase tracking-widest text-gradient-brand"
             variants={textVariants}
             initial="hidden"
             animate="visible"
@@ -70,7 +74,7 @@ export function ReportArticleHeader({
 
           {/* Project Title: Large heading with sequential animation delay */}
           <motion.h1 
-            className="font-heading text-4xl font-bold tracking-tight text-foreground sm:text-5xl md:text-6xl"
+            className="font-heading text-4xl font-bold tracking-tight text-gradient-brand sm:text-5xl md:text-6xl"
             variants={textVariants}
             initial="hidden"
             animate="visible"
@@ -81,7 +85,7 @@ export function ReportArticleHeader({
 
           {/* Accent Underline Line */}
           <motion.div 
-            className="h-1 w-12 bg-primary rounded-full"
+            className="h-1 w-12 gradient-accent rounded-full"
             initial={{ width: 0 }}
             animate={{ width: 48 }}
             transition={{ delay: 0.3, duration: 0.8 }}
@@ -97,7 +101,7 @@ export function ReportArticleHeader({
           >
             <time dateTime={report.date}>{formatArticleDate(report.date)}</time>
             <span>·</span>
-            <span className="uppercase tracking-wider">{report.category}</span>
+            <CategoryBadge category={report.category} showIcon />
           </motion.div>
 
           {/* Project Summary: Leading paragraph */}

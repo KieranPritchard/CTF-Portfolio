@@ -1,3 +1,7 @@
+/**
+ * Renders write-up markdown content with custom typography, tables, images, and code blocks.
+ * Extracts carousel image blocks and delegates them to MarkdownCarousel.
+ */
 "use client"
 
 import { Variants } from "framer-motion"

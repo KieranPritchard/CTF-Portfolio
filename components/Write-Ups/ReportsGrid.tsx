@@ -1,10 +1,15 @@
+/**
+ * Write-ups listing page with category filtering, search, and multiple view modes.
+ * Supports grid, card, and list layouts with animated transitions.
+ */
 "use client"
 
 import { useState } from "react"
 import Link from "next/link"
-import { Card, CardContent, CardFooter, CardHeader } from "../ui/card"
-import { Badge } from "../ui/badge"
+import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
+import { CategoryBadge } from "@/components/shared/CategoryBadge"
 import { cn } from "@/lib/utils"
+import { getCategoryConfig, REPORT_CATEGORIES } from "@/lib/categories"
 import type { ReportSummary } from "@/types/report"
 import {
     ArrowRight,
@@ -13,41 +18,12 @@ import {
     List,
     Search,
     ChevronDown,
-    Shield,
-    Terminal,
-    KeyRound,
-    Unlock,
-    Database,
-    Eye,
-    Binary,
-    type LucideIcon,
 } from "lucide-react"
 
-/**
- * Maps each project category to a representative icon.
- * Used by `getCategoryIcon` to keep icon usage consistent
- * across the grid and card view modes.
- */
-const categoryIcons: Record<string, LucideIcon> = {
-    "web-application": Shield,
-    "linux": Terminal,
-    "windows": KeyRound,
-    "password-cracking": Unlock,
-    "database-exploitation": Database,
-    "osint": Eye,
-    "cryptography": Binary,
-}
-
-/**
- * Resolves and renders the icon associated with a given project category.
- * Falls back to the Shield icon if the category has no explicit mapping.
- *
- * @param category - The project's category string (e.g. "linux").
- * @param className - Tailwind classes applied to the rendered icon.
- */
-function getCategoryIcon(category: string, className: string) {
-    const Icon = categoryIcons[category] ?? Shield
-    return <Icon className={className} />
+/** Renders the Lucide icon associated with a given CTF category. */
+function CategoryIcon({ category, className }: { category: string; className?: string }) {
+    const { icon: Icon } = getCategoryConfig(category)
+    return <Icon className={cn("category-icon", className)} aria-hidden="true" />
 }
 
 /**
@@ -78,24 +54,20 @@ export default function ReportsGrid({ className, reports }: Readonly<{ className
         return matchesFilter && matchesSearch
     })
 
-    /** List of valid project categories for the filter buttons. */
-    const categories = ["web-application", "linux", "windows", "password-cracking", "database-exploitation", "osint", "cryptography"]
-
     return (
         <section className={cn("mx-auto w-full max-w-7xl px-4 py-12 md:px-6 lg:px-8", className)}>
             
             {/* Header and Controls Area */}
             <div className="mb-12 space-y-6">
                 <div className="space-y-2">
-                    <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-foreground">
+                    <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-gradient-brand">
                         Everything I&apos;ve built.
                     </h2>
-                    {/* Decorative blue accent line */}
-                    <div className="h-1 w-12 bg-primary rounded-full mt-2" />
+                    <div className="h-1 w-12 gradient-accent rounded-full mt-2" />
                 </div>
 
                 {/* Control Bar: Filter, Search, and View Toggles */}
-                <div className="rounded-xl border border-border bg-card p-4 space-y-4">
+                <div className="rounded-xl gradient-border bg-card p-4 space-y-4">
                     <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                         {/* Category Filter Dropdown */}
                         <div className="flex items-center gap-2 w-full md:w-auto">
@@ -107,9 +79,9 @@ export default function ReportsGrid({ className, reports }: Readonly<{ className
                                     className="w-full md:w-auto appearance-none rounded-md border border-border bg-card py-1.5 pl-3 pr-8 text-xs font-medium outline-none focus:border-primary transition-colors cursor-pointer"
                                 >
                                     <option value="all">All ({reports.length})</option>
-                                    {categories.map((cat) => (
+                                    {REPORT_CATEGORIES.map((cat) => (
                                         <option key={cat} value={cat}>
-                                            {cat.charAt(0).toUpperCase() + cat.slice(1)} ({reports.filter(p => p.category === cat).length})
+                                            {getCategoryConfig(cat).label} ({reports.filter(p => p.category === cat).length})
                                         </option>
                                     ))}
                                 </select>
@@ -154,39 +126,62 @@ export default function ReportsGrid({ className, reports }: Readonly<{ className
                     >
                         {/* Grid View Mode: Compact Cards */}
                         {viewMode === "grid" && (
-                            <Card className="group h-full flex flex-col border-border/50 hover:border-primary/50 transition-all">
+                            <Card
+                                data-category={report.category}
+                                className="category-card group h-full flex flex-col ring-0 transition-all"
+                            >
                                 <CardHeader>
-                                    <div className="p-2 w-fit rounded-lg bg-muted border border-border group-hover:border-primary/50 transition-colors">
-                                        {getCategoryIcon(report.category, "h-5 w-5 text-primary")}
+                                    <div
+                                        data-category={report.category}
+                                        className="category-icon-wrap p-2 w-fit rounded-lg border transition-colors"
+                                    >
+                                        <CategoryIcon category={report.category} className="h-5 w-5" />
                                     </div>
                                 </CardHeader>
                                 <CardContent className="flex-1">
                                     <h3 className="font-bold text-lg mb-2">{report.title}</h3>
                                     <p className="text-sm text-muted-foreground line-clamp-3 mb-4">{report.description}</p>
-                                    <div className="text-xs font-mono text-muted-foreground">
-                                        {report.date} • {report.category}
+                                    <div className="flex flex-wrap items-center gap-2">
+                                        <span className="text-xs font-mono text-muted-foreground">{report.date}</span>
+                                        <CategoryBadge category={report.category} className="text-[10px]" />
                                     </div>
                                 </CardContent>
-                                <CardFooter className="pt-4 border-t border-border/50">
-                                    <Link href={`/write-ups/${report.slug}`} className="text-xs font-bold hover:underline">View Project</Link>
+                                <CardFooter>
+                                    <Link
+                                        href={`/write-ups/${report.slug}`}
+                                        data-category={report.category}
+                                        className="category-text text-xs font-bold hover:underline"
+                                    >
+                                        View Project
+                                    </Link>
                                 </CardFooter>
                             </Card>
                         )}
 
                         {/* Card View Mode: Horizontal Extended Cards */}
                         {viewMode === "card" && (
-                            <div className="group flex flex-col md:flex-row gap-6 p-6 rounded-lg border border-border bg-card">
-                                <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-lg bg-muted border border-border">
-                                    {getCategoryIcon(report.category, "h-6 w-6 text-primary")}
+                            <div
+                                data-category={report.category}
+                                className="category-card group flex flex-col md:flex-row gap-6 p-6 rounded-xl ring-0 transition-all"
+                            >
+                                <div
+                                    data-category={report.category}
+                                    className="category-icon-wrap flex h-16 w-16 shrink-0 items-center justify-center rounded-lg border"
+                                >
+                                    <CategoryIcon category={report.category} className="h-6 w-6" />
                                 </div>
                                 <div className="flex-1 space-y-2">
                                     <div className="flex items-center justify-between">
-                                        <Badge variant="outline" className="text-[10px] uppercase tracking-wider">{report.category}</Badge>
+                                        <CategoryBadge category={report.category} className="text-[10px]" showIcon />
                                         <span className="text-xs font-mono text-muted-foreground">{report.date}</span>
                                     </div>
                                     <h3 className="text-xl font-bold">{report.title}</h3>
                                     <p className="text-sm text-muted-foreground">{report.description}</p>
-                                    <Link href={`/write-ups/${report.slug}`} className="inline-flex items-center gap-2 text-sm font-bold text-primary hover:underline">
+                                    <Link
+                                        href={`/write-ups/${report.slug}`}
+                                        data-category={report.category}
+                                        className="category-text inline-flex items-center gap-2 text-sm font-bold hover:underline"
+                                    >
                                         Read full case study <ArrowRight className="h-3 w-3" />
                                     </Link>
                                 </div>
@@ -195,7 +190,10 @@ export default function ReportsGrid({ className, reports }: Readonly<{ className
 
                         {/* List View Mode: Clean Row Items */}
                         {viewMode === "list" && (
-                            <div className="flex items-center justify-between py-6 border-b border-border group hover:bg-muted/30 px-2 transition-colors">
+                            <div
+                                data-category={report.category}
+                                className="category-list-row flex items-center justify-between py-6 border-b border-border px-3 sm:px-4 transition-colors"
+                            >
                                 <div className="flex items-center gap-8">
                                     <span className="font-mono text-muted-foreground w-8">0{index + 1}</span>
                                     <div>
@@ -204,9 +202,13 @@ export default function ReportsGrid({ className, reports }: Readonly<{ className
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-4 sm:gap-8 text-right">
-                                    <span className="hidden sm:inline-block text-xs font-mono uppercase text-muted-foreground w-20">{report.category}</span>
+                                    <CategoryBadge category={report.category} className="hidden sm:inline-flex text-[10px]" />
                                     <span className="hidden sm:inline-block text-xs font-mono text-muted-foreground w-24">{report.date}</span>
-                                    <Link href={`/write-ups/${report.slug}`} className="text-primary hover:text-primary/80">
+                                    <Link
+                                        href={`/write-ups/${report.slug}`}
+                                        data-category={report.category}
+                                        className="category-text hover:opacity-80 transition-opacity"
+                                    >
                                         <ArrowRight className="h-4 w-4" />
                                     </Link>
                                 </div>

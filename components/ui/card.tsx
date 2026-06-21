@@ -1,3 +1,7 @@
+/**
+ * shadcn/ui Card primitive.
+ * Composable container with Header, Title, Description, Content, Footer, and Action slots.
+ */
 import * as React from "react"
 
 import { cn } from "@/lib/utils"

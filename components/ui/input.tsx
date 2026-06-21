@@ -1,3 +1,7 @@
+/**
+ * shadcn/ui Input primitive.
+ * Styled text input field used in forms across the site.
+ */
 import * as React from "react"
 
 import { cn } from "@/lib/utils"

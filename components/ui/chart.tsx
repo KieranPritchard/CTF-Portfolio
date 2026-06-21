@@ -1,3 +1,7 @@
+/**
+ * shadcn/ui Chart primitive.
+ * Recharts wrapper with theme-aware CSS variable injection and tooltip styling.
+ */
 "use client"
 
 import * as React from "react"

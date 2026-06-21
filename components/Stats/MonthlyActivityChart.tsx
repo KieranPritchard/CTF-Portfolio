@@ -1,3 +1,7 @@
+/**
+ * Vertical bar chart showing write-up activity grouped by month.
+ * Displays hover tooltips with exact counts and responsive month labels.
+ */
 "use client"
 import { motion } from "framer-motion"
 
@@ -16,7 +20,7 @@ export function MonthlyActivityChart({ data }: { data: { month: string, count: n
                             </span>
                         )}
                         <motion.div 
-                            className="w-full bg-primary/80 group-hover:bg-primary transition-colors rounded-t-sm"
+                            className="w-full gradient-accent group-hover:brightness-110 transition-[filter] rounded-t-sm"
                             initial={{ height: 0 }}
                             whileInView={{ height: `${(item.count / max) * 100}%` }}
                             viewport={{ once: true }}

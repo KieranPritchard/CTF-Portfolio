@@ -1,6 +1,12 @@
+/**
+ * Summary stat cards for the stats page.
+ * Displays total write-ups, category count, latest activity date, and most active category.
+ */
 "use client"
 import { motion } from "framer-motion"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { CategoryBadge } from "@/components/shared/CategoryBadge"
+import { isReportCategory } from "@/lib/categories"
 
 export function StatsCards({ total, categories, latest, mostActive }: { total: number, categories: number, latest: string, mostActive: string }) {
     return (
@@ -41,7 +47,11 @@ export function StatsCards({ total, categories, latest, mostActive }: { total: n
                         <CardTitle className="text-sm font-medium">Most Active</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-xl font-bold capitalize">{mostActive}</div>
+                        {isReportCategory(mostActive) ? (
+                            <CategoryBadge category={mostActive} className="text-sm" showIcon />
+                        ) : (
+                            <div className="text-xl font-bold capitalize">{mostActive}</div>
+                        )}
                     </CardContent>
                 </Card>
             </motion.div>

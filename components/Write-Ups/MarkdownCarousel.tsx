@@ -1,3 +1,7 @@
+/**
+ * Image carousel for write-up screenshot galleries.
+ * Receives pre-extracted image paths from ReportMarkdown's carousel block parser.
+ */
 "use client"
 
 import Image from "next/image"

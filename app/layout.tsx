@@ -1,9 +1,11 @@
 import { Geist, Geist_Mono, Inter } from "next/font/google"
 
 import "./globals.css"
-import { ThemeProvider } from "@/components/theme-provider"
+import { ThemeProvider } from "@/components/providers/theme-provider"
 import { cn } from "@/lib/utils";
-import { NavigationBar } from "@/components/Main/Navigation/NavigationBar";
+import { Footer } from "@/components/layout/Footer";
+import { NavigationBar } from "@/components/layout/NavigationBar";
+import { MeshBackground } from "@/components/ui/mesh-background";
 
 const inter = Inter({subsets:['latin'],variable:'--font-sans'})
 
@@ -25,8 +27,13 @@ export default function RootLayout({
     >
       <body>
         <ThemeProvider>
-          <NavigationBar />
-          {children}
+          <div aria-hidden="true" className="fixed inset-0 -z-20 bg-background" />
+          <MeshBackground fixed intensity="default" />
+          <div className="relative flex min-h-screen flex-col">
+            <NavigationBar />
+            <main className="flex-1">{children}</main>
+            <Footer />
+          </div>
         </ThemeProvider>
       </body>
     </html>

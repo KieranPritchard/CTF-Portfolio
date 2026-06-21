@@ -1,3 +1,7 @@
+/**
+ * shadcn/ui Textarea primitive.
+ * Multi-line text input used in the contact form and other forms.
+ */
 import * as React from "react"
 
 import { cn } from "@/lib/utils"

@@ -1,3 +1,7 @@
+/**
+ * shadcn/ui Table primitive.
+ * Composable table with Header, Body, Row, Head, and Cell sub-components.
+ */
 "use client"
 
 import * as React from "react"

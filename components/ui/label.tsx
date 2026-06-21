@@ -1,3 +1,7 @@
+/**
+ * shadcn/ui Label primitive.
+ * Accessible form field label built on Radix UI.
+ */
 "use client"
 
 import * as React from "react"

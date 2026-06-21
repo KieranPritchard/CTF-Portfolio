@@ -1,3 +1,7 @@
+/**
+ * shadcn/ui Badge primitive.
+ * Small inline label with variant styles for status, tags, and metadata.
+ */
 import * as React from "react"
 import { cva, type VariantProps } from "class-variance-authority"
 import { Slot } from "radix-ui"
@@ -9,7 +13,7 @@ const badgeVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground [a]:hover:bg-primary/80",
+        default: "mesh-gradient text-primary-foreground [a]:hover:brightness-110",
         secondary:
           "bg-secondary text-secondary-foreground [a]:hover:bg-secondary/80",
         destructive:
