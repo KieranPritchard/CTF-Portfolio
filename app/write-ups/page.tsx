@@ -1,6 +1,11 @@
 import ReportsGrid from "@/components/Write-Ups/ReportsGrid";
 import { getAllReports } from "@/lib/reports";
 
+export const metadata = {
+    title: "Write Ups | CTF Portfolio",
+    description: "A look at my research and write-ups.",
+}
+
 /**
  * Write-Ups listing page.
  *
