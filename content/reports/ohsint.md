@@ -2,86 +2,110 @@
 title: "OhSINT"
 slug: "ohsint"
 category: "osint"
-description: "What information can you possible get with just one image file? Note: This challenge was updated on 2024-02-01. If you are following any older walkthroughs, expect a small change. Additionally, the fi"
+description: "What information can you possibly get with just one image file? This beginner-friendly OSINT challenge tasks you with tracing a person's digital footprint starting from a single piece of image metadata."
 date: "2025-07-06"
 ---
 
 # Challenge Description
 
-What information can you possible get with just one image file?
+What information can you possibly get with just one image file?
 
-**Note:** This challenge was updated on 2024-02-01. If you are following any older walkthroughs, expect a small change. Additionally, the file is also available on the AttackBox, under the `/Rooms/OhSINT` directory.
+**Note:** This challenge was updated on 2024-02-01. If you are following older walkthroughs, expect small differences. The file is also available on the AttackBox under `/Rooms/OhSINT`.
 
 # Files Provided
 
-- An image of the Windows XP wallpaper
+- `WindowsXP_1551719014755.jpg` — a Windows XP wallpaper image
 
 # Challenge Setup
 
 ## Tools Used:
 
-- **ExifTool** — for extracting metadata from images
-- **Google** — for OSINT investigations and lookups
-- **Wigle.net** — for BSSID/SSID lookup and geolocation
+- **ExifTool** — Extracting metadata from the image
+- **Google** — OSINT investigation and account discovery
+- **Wigle.net** — BSSID lookup and SSID identification
 
 ## Environment:
 
-- TryHackMe AttackBox
+- TryHackMe AttackBox / Kali Linux
 
 # Initial Recon
 
-I first downloaded the image to take a closer look at it. on its own it looks like a random image of the windows wallpaper for windows XP. although as i have learned from watching films and stuff theres probably something more to it so thats what i did. 
+The image was a standard Windows XP wallpaper — nothing visually suspicious. In OSINT, the interesting data is often hidden in metadata rather than the image itself, so the first step was to run ExifTool:
 
-# ️Exploitation / Solution
+```
+exiftool WindowsXP_1551719014755.jpg
+```
 
-## 1. Looking At the photo
+Two pieces of information stood out in the output:
 
-- I used **ExifTool** to extract metadata from the image. This revealed useful information such as GPS data and copyright information.
-- A key piece of data found was a copyright tag: **"OWoodflint"**.
-- I Googled this name, which led me to a **GitHub repository** containing a project called *People Finder*. The repository also contained a **WordPress website link** and an **email address**, answering two questions in the TryHackMe challenge.
+- **GPS coordinates** — latitude and longitude embedded in the EXIF data
+- **Copyright field:** `OWoodflint`
 
-## 2. Exploring Further
+The copyright tag gave a username to pivot from.
 
-- Visiting the WordPress site revealed that the individual was located in **New York**, which answered another question on TryHackMe.
-- While browsing the site, I also noted a few potential clues hidden in the HTML source code (more on that later).
+# Exploitation / Solution
 
-## 3. Looking on x
+## Step One — Discovering Online Accounts
 
-- A Google search for "OWoodflint" revealed an **X (Twitter)** account.
-- The profile image (avatar) was a **cat**, which answered the corresponding challenge question.
-- One of the tweets from the account mentioned a **BSSID**.
-- I used **wigle.net** to search for the BSSID and successfully obtained the corresponding **SSID** and **location name**.
+A Google search for `OWoodflint` returned three results: a **Twitter/X account**, a **GitHub profile**, and a **WordPress blog**. All three turned out to contain useful information.
 
-## 4. Finding the password
+**Twitter/X:** The profile picture was a **cat**, answering the first challenge question about the user's avatar.
 
-- I returned to the WordPress site and viewed the **page source**.
-- Hidden in the HTML was a paragraph element that didn’t appear in the rendered page.
-- Copying and pasting that hidden text into TryHackMe revealed it to be the **final flag**, successfully completing the challenge.
+**GitHub:** The README file confirmed the user's home city as **London** and contained their personal email address: `OWoodflint@gmail.com`.
+
+## Step Two — Finding the SSID via BSSID
+
+On the Twitter/X account, one tweet read:
+
+> "From my house I can get free wifi ;D Bssid: B4:5D:50:AA:86:41 - Go nuts!"
+
+A BSSID (Basic Service Set Identifier) is the MAC address of a wireless access point — a unique hardware identifier. I used **Wigle.net** (a public wireless network mapping database) to look it up. Note: Wigle.net now requires a registered account, and new accounts are limited to 5 detailed queries per day.
+
+Searching the BSSID `B4:5D:50:AA:86:41` in Wigle's Advanced Search (View → Advanced Search → WiFi/Cell Detail) and clicking the map result placed the access point in **London**. Zooming in to street level revealed the SSID: **`UnileverWiFi`**.
+
+## Step Three — Location and Holiday Destination
+
+The **GitHub profile** listed London as the user's home location.
+
+The **WordPress blog** (`oliverwoodflint.wordpress.com`) contained a post mentioning the user was on holiday in **New York** — a separate detail from their home city.
+
+## Step Four — Finding the Hidden Password
+
+Returning to the WordPress blog, I viewed the HTML page source. A paragraph element was present in the source but invisible in the rendered page — the text was written in **white font on a white background**, hiding it from casual readers. Selecting all text on the page (Ctrl+A) or inspecting the source directly reveals it. This hidden string was the final answer to the challenge.
 
 # Flag
 
 ```
-None
+No traditional flag format — challenge answers are submitted directly to TryHackMe questions.
 ```
+
+**Challenge answers summary:**
+- Avatar: Cat (Twitter/X profile picture)
+- City: London (GitHub profile)
+- SSID: UnileverWiFi (Wigle.net lookup via BSSID)
+- Email: OWoodflint@gmail.com (GitHub README)
+- Email source: GitHub
+- Holiday location: New York (WordPress blog)
+- Password: Found in WordPress blog HTML source (white text on white background)
 
 # Tools Used
 
-- **ExifTool** — For extracting metadata from the image
-- **CyberChef** — (if used for decoding any hidden strings)
-- **Wigle.net** — To identify SSID/location from BSSID
-- **Google/X** — For OSINT sleuthing and locating online accounts
+- **ExifTool** — Extracting image metadata to identify the username
+- **Google** — Discovering associated online accounts
+- **Wigle.net** — Identifying the SSID from a BSSID value
 
-#  Notes / Lessons Learned
+# Notes / Lessons Learned
 
-- Always check image metadata — you never know what's hidden in plain sight.
-- GitHub and social media can leak a lot more personal info than you'd expect.
-- Even seemingly harmless sites can contain hidden content in the source code.
-- OSINT is powerful — and sometimes terrifying.
+- Image metadata is often overlooked but can contain GPS coordinates, device info, and personally identifying data like copyright tags.
+- A single username can link multiple accounts across platforms — GitHub, Twitter, and WordPress in this case — each leaking a different piece of information.
+- BSSIDs are publicly mappable via Wigle.net. Tweeting a BSSID is equivalent to broadcasting your home network's location.
+- Hidden content doesn't have to be technically complex — white text on a white background is invisible to the eye but trivially discoverable in page source or with Ctrl+A. Always inspect source code.
+- OSINT investigations are cumulative: each platform answered a different question, and the full picture only emerged by cross-referencing all three.
 
 <carousel>
-![Screenshot of the challenge soloution](/images/ohsint/OhSINT_1.png)
-![Screenshot of the challenge soloution](/images/ohsint/OhSINT_2.png)
-![Screenshot of the challenge soloution](/images/ohsint/OhSINT_3.png)
-![Screenshot of the challenge soloution](/images/ohsint/OhSINT_4.png)
-![Screenshot of the challenge soloution](/images/ohsint/OhSINT_5.png)
+![Screenshot 1](/images/ohsint/OhSINT_1.png)
+![Screenshot 2](/images/ohsint/OhSINT_2.png)
+![Screenshot 3](/images/ohsint/OhSINT_3.png)
+![Screenshot 4](/images/ohsint/OhSINT_4.png)
+![Screenshot 5](/images/ohsint/OhSINT_5.png)
 </carousel>

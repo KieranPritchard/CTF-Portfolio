@@ -10,12 +10,10 @@ date: "2025-08-01"
 
 ## Tools Used:
 
-* **Nmap** — For initial host discovery, port scanning, and service enumeration.
-* **Gobuster** — Directory and file brute forcing.
-* **Browser Developer Tools** — Inspecting HTML comments and discovering hidden credentials.
-* **GTFOBins** — Identifying `sudo` or restricted-shell bypass methods.
-* **sudo** — Used to escalate privileges due to misconfigurations.
-* **Linux CLI Utilities** (`tac`, `ls`, `sudo -l`, etc.) — Navigating the filesystem and reading files when primary commands were blocked.
+- **Nmap** — Port scanning and service enumeration
+- **Gobuster** — Directory and file brute-forcing
+- **Browser Developer Tools** — Inspecting HTML source and comments
+- **Linux CLI utilities** (`ls`, `tac`, `sudo`, etc.) — Navigating the filesystem and reading files
 
 ## Environment:
 
@@ -24,75 +22,137 @@ date: "2025-08-01"
 
 # Initial Recon
 
-After deploying the machine and obtaining the target IP, I performed an **Nmap** scan. The scan revealed two open services:
-
-* **SSH** on port `22`
-* **Apache Web Server** on port `80`
-
-# ️Exploitation / Solution
-
-## 1. Initial Enumeration
-
-I started by running Gobuster with the common.txt wordlist from SecLists.
-Visiting the web interface revealed a page telling me to find a username and password.
-
-## 2. Discovering Credentials
-
-Inspecting the page source exposed a username hidden in an HTML comment.
-A quick check of robots.txt revealed another string possibly being a password.
-An attempt to log in via SSH using these credentials failed, so I continued enumeration.
-
-## 3. Further Directory Busting
-
-Running Gobuster again with file extension enumeration uncovered more files, including: "portal.php" accessing this page led to a login portal.
-
-## 4. Portal Access & Command Injection
-
-Using the discovered credentials, I successfully logged into the portal.
-The interface allowed command execution, which I verified by running whoami.
-Although the "cat" command was disabled, I continued exploring the filesystem.
-
-## 5. Privilege Escalation Attempts
-
-Using "sudo -l", I saw that certain commands could be executed with sudo without requiring a password.
-Some GTFOBins escalation attempts didn’t work, but I found a workaround: replacing "cat" with "tac", which functioned normally.
-
-This allowed me to extract the first ingredient.
-
-## 6. Collecting All Ingredients
-
-Navigating to "/home", I found directories for "rick" and "ubuntu".
-Inside the "rick" directory, a folder named "second_ingredient" contained the second item.
-Again using tac, I read its contents.
-Finally, leveraging my sudo permissions, I accessed the "/root" directory and obtained the third ingredient.
-
-## 7. Completion
-
-After retrieving all three ingredients, the challenge was successfully completed.
-
-# Flag
+After deploying the machine, I ran an Nmap scan:
 
 ```
-Flag One: mr. meeseek hair
-Flag Two: 1 jerry tear
-Flag Three: fleeb juice
+nmap -sC -sV <target-ip>
+```
+
+Two open ports were found:
+
+- **Port 22** — SSH
+- **Port 80** — Apache HTTP
+
+# Exploitation / Solution
+
+## Step One — Discovering Credentials
+
+Visiting the web application in a browser showed a landing page with a message from Rick. Inspecting the HTML source revealed a username hidden in a comment:
+
+**Username:** `R1ckRul3s`
+
+I then checked `robots.txt` directly:
+
+```
+http://<target-ip>/robots.txt
+```
+
+The file contained a single string — Rick's famous catchphrase — which turned out to be the portal password:
+
+**Password:** `Wubbalubbadubdub`
+
+An attempt to log in via SSH with these credentials failed, so I moved on to further enumeration.
+
+## Step Two — Directory Enumeration
+
+I ran Gobuster with PHP and text file extension enumeration to find hidden pages:
+
+```
+gobuster dir -u http://<target-ip> -w /usr/share/wordlists/dirb/common.txt -x php,txt
+```
+
+This returned `login.php` and `portal.php` (both initially returning 302 redirects), as well as `robots.txt`.
+
+## Step Three — Portal Access and Command Execution
+
+Navigating to `login.php` and using the credentials `R1ckRul3s:Wubbalubbadubdub` logged me into the portal, which redirected to `portal.php`.
+
+The portal exposed a **command execution panel** — essentially a web shell — that accepted Linux commands. Running `ls` in the panel revealed two interesting files in the current directory:
+
+- `Sup3rS3cretPickl3Ingred.txt`
+- `clue.txt`
+
+Attempting `cat Sup3rS3cretPickl3Ingred.txt` failed — the application had blacklisted the `cat` command. I used `tac` instead (which prints file contents in reverse line order but still outputs the full content for single-line files):
+
+```
+tac Sup3rS3cretPickl3Ingred.txt
+```
+
+**Ingredient 1:** `mr. meeseek hair`
+
+`clue.txt` hinted to look around the filesystem for the remaining ingredients.
+
+## Step Four — Second Ingredient
+
+I enumerated the home directory:
+
+```
+ls /home
+```
+
+This showed two users: `rick` and `ubuntu`. Inside rick's home directory:
+
+```
+ls /home/rick
+```
+
+A file named `second ingredients` (note the space) was present. I read it with `tac`:
+
+```
+tac '/home/rick/second ingredients'
+```
+
+**Ingredient 2:** `1 jerry tear`
+
+## Step Five — Third Ingredient (Privilege Escalation)
+
+I checked the sudo permissions for the current user (`www-data`):
+
+```
+sudo -l
+```
+
+The output showed that `www-data` could run **all commands as root with no password required**:
+
+```
+(ALL) NOPASSWD: ALL
+```
+
+No privilege escalation exploit was needed — I could simply prefix any command with `sudo`. I listed the root directory:
+
+```
+sudo ls /root
+```
+
+This revealed `3rd.txt`. I read it with:
+
+```
+sudo tac /root/3rd.txt
+```
+
+**Ingredient 3:** `fleeb juice`
+
+# Flags
+
+```
+Ingredient 1: mr. meeseek hair
+Ingredient 2: 1 jerry tear
+Ingredient 3: fleeb juice
 ```
 
 # Tools Used
 
-* **Nmap** — For initial host discovery, port scanning, and service enumeration.
-* **Gobuster** — Directory and file brute forcing.
-* **Browser Developer Tools** — Inspecting HTML comments and discovering hidden credentials.
-* **GTFOBins** — Identifying `sudo` or restricted-shell bypass methods.
-* **sudo** — Used to escalate privileges due to misconfigurations.
-* **Linux CLI Utilities** (`tac`, `ls`, `sudo -l`, etc.) — Navigating the filesystem and reading files when primary commands were blocked.
+- **Nmap** — Port scanning and service enumeration
+- **Gobuster** — Directory and file brute-forcing
+- **Browser Developer Tools** — Discovering the username in HTML source comments
+- **Linux CLI utilities** (`ls`, `tac`, `sudo`) — Navigating the filesystem and reading files via the web shell
 
 # Notes / Lessons Learned
 
-- If a command is blocked, try alternatives—utilities like tac, head, or less can bypass restrictions.
-- Inspect everything: page source, comments, and simple files often contain direct hints.
-
-
+- Always check the HTML source and `robots.txt` early — both gave away credentials directly in this room.
+- When a command is blocked (`cat`), try alternatives: `tac`, `less`, `strings`, or `head` will often work as substitutes.
+- `sudo -l` should always be one of the first post-access commands. Here it immediately revealed unrestricted root access with no password, making the rest of the challenge trivial.
+- A web shell embedded in a portal is effectively full remote code execution — even without a reverse shell, command injection through a browser interface gives complete filesystem access.
 
 <carousel>
 <img src="/images/pickle-rick/Pickle_Rick_Screenshot_1.png">

