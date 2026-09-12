@@ -4,7 +4,7 @@ import "./globals.css"
 import { ThemeProvider } from "@/components/providers/theme-provider"
 import { cn } from "@/lib/utils";
 import { Footer } from "@/components/layout/Footer";
-import { NavigationBar } from "@/components/layout/NavigationBar";
+import {NavigationBar} from "@/components/layout/NavigationBar"
 import { MeshBackground } from "@/components/ui/mesh-background";
 
 const inter = Inter({subsets:['latin'],variable:'--font-sans'})

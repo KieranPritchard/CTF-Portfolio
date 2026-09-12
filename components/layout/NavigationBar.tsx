@@ -20,7 +20,7 @@ const navItems = [
   { label: "Contact", href: "/contact", icon: Mail },
 ]
 
-function NavigationBar() {
+export function NavigationBar() {
   // Stores whether the navigation bar is open or not
   const [isOpen, setIsOpen] = useState(false)
 
