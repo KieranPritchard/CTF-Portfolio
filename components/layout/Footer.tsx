@@ -44,7 +44,7 @@ export function Footer() {
         <div className="gradient-border mx-auto w-full max-w-5xl overflow-hidden rounded-xl bg-card text-card-foreground">
           <div className="grid gap-10 px-6 py-8 md:grid-cols-3 md:px-8 md:py-10">
             <div className="space-y-4">
-              <FooterSectionTitle>Kieran's CTF Write Ups</FooterSectionTitle>
+              <FooterSectionTitle>Kieran&#39;s CTF Write Ups</FooterSectionTitle>
               <p className="max-w-xs text-sm leading-relaxed text-muted-foreground">
                 Documenting CTF walkthroughs and security research with clear,
                 actionable write-ups.
