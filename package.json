@@ -9,7 +9,8 @@
     "start": "next start",
     "lint": "eslint",
     "format": "prettier --write \"**/*.{ts,tsx}\"",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "validate:report:frontmatter": "node scripts/validate-report-frontmatter.mjs"
   },
   "dependencies": {
     "class-variance-authority": "^0.7.1",
