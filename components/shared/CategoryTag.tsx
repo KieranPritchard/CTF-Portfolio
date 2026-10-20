@@ -35,7 +35,7 @@ export const categoryTokens: Record<string, CategoryTokens> = {
 const fallbackTokens: CategoryTokens = { accent: "146 150 177", border: "158 163 190", tint: "28 30 43", action: "28 30 43" }
 
 /**
- * Builds the CSS variables (--cat, --cat-border, --cat-tint, --cat-action) that category-coloured classes read.
+ * Builds the CSS variables that category-coloured classes read.
  * The key is normalised so "Web Application", "web_application" and "web-application" all match.
  */
 export function categoryStyle(category: string): CSSProperties {
@@ -51,8 +51,8 @@ export function categoryStyle(category: string): CSSProperties {
 
 /**
  * The two tag styles in the Figma:
- * - "card": on write-up cards. The outline is the blended border colour at 43%, and there is no icon.
- * - "stat": on the stats page. The outline is the plain accent colour at 25%, with a 12px icon.
+ * - "card": on write-up cards.
+ * - "stat": on the stats page.
  */
 type CategoryTagVariant = "card" | "stat"
 
@@ -62,16 +62,20 @@ const variantStyles: Record<CategoryTagVariant, string> = {
   stat: "border-[rgb(var(--cat)/0.251)]",
 }
 
+// Interface type for the category buttons
+interface CategoryTagProps {
+  category: string;
+  variant?: CategoryTagVariant;
+  showIcon?: boolean;
+  className?: string;
+}
+
 /**
  * Pill tag showing the category name: accent text on a 12% accent tint with a 1px outline,
  * 10px medium uppercase text with 5% tracking. Sets its own colour variables, so it works anywhere.
  */
-export function CategoryTag({
-                              category,
-                              variant = "card",
-                              showIcon = variant === "stat",
-                              className,
-                            }: Readonly<{ category: string; variant?: CategoryTagVariant; showIcon?: boolean; className?: string }>) {
+export function CategoryTag({ category, variant = "card", showIcon = variant === "stat", className, }:CategoryTagProps) {
+  // Stores the label and icon from the category config
   const { label, icon: Icon } = getCategoryConfig(category)
   return (
     <span
