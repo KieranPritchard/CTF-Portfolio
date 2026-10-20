@@ -20,6 +20,14 @@ export interface CategoryTokens {
   action: string
 }
 
+// Interface type for the category buttons
+interface CategoryTagProps {
+  category: string;
+  variant?: CategoryTagVariant;
+  showIcon?: boolean;
+  className?: string;
+}
+
 /** Category colours read from the Figma, keyed by a normalised category name. */
 export const categoryTokens: Record<string, CategoryTokens> = {
   cryptography: { accent: "187 145 255", border: "162 156 252", tint: "33 31 36", action: "39 41 62" },
@@ -35,21 +43,6 @@ export const categoryTokens: Record<string, CategoryTokens> = {
 const fallbackTokens: CategoryTokens = { accent: "146 150 177", border: "158 163 190", tint: "28 30 43", action: "28 30 43" }
 
 /**
- * Builds the CSS variables that category-coloured classes read.
- * The key is normalised so "Web Application", "web_application" and "web-application" all match.
- */
-export function categoryStyle(category: string): CSSProperties {
-  const key: string = category.toLowerCase().replace(/[^a-z0-9]+/g, "-")
-  const tokens: CategoryTokens = categoryTokens[key] ?? fallbackTokens
-  return {
-    "--cat": tokens.accent,
-    "--cat-border": tokens.border,
-    "--cat-tint": tokens.tint,
-    "--cat-action": tokens.action,
-  } as CSSProperties
-}
-
-/**
  * The two tag styles in the Figma:
  * - "card": on write-up cards.
  * - "stat": on the stats page.
@@ -62,12 +55,19 @@ const variantStyles: Record<CategoryTagVariant, string> = {
   stat: "border-[rgb(var(--cat)/0.251)]",
 }
 
-// Interface type for the category buttons
-interface CategoryTagProps {
-  category: string;
-  variant?: CategoryTagVariant;
-  showIcon?: boolean;
-  className?: string;
+/**
+ * Builds the CSS variables that category-coloured classes read.
+ * The key is normalised so "Web Application", "web_application" and "web-application" all match.
+ */
+export function categoryStyle(category: string): CSSProperties {
+  const key: string = category.toLowerCase().replace(/[^a-z0-9]+/g, "-")
+  const tokens: CategoryTokens = categoryTokens[key] ?? fallbackTokens
+  return {
+    "--cat": tokens.accent,
+    "--cat-border": tokens.border,
+    "--cat-tint": tokens.tint,
+    "--cat-action": tokens.action,
+  } as CSSProperties
 }
 
 /**
