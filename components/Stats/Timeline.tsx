@@ -5,7 +5,7 @@
 "use client"
 import { motion } from "framer-motion"
 import Link from "next/link"
-import { CategoryBadge } from "@/components/shared/CategoryBadge"
+import { CategoryTag } from "@/components/shared/CategoryTag"
 import type { ReportSummary } from "@/types/report"
 
 export function Timeline({ reports }: { reports: ReportSummary[] }) {
@@ -30,7 +30,7 @@ export function Timeline({ reports }: { reports: ReportSummary[] }) {
                         <Link href={`/write-ups/${report.slug}`} className="font-medium hover:text-primary hover:underline transition-colors block mt-1 text-lg">
                             {report.title}
                         </Link>
-                        <CategoryBadge category={report.category} className="mt-2 text-[10px]" />
+                        <CategoryTag category={report.category} className="mt-2 text-[10px]" />
                     </motion.div>
                 ))}
             </div>

@@ -1,6 +1,11 @@
 /**
  * Image carousel for write-up screenshot galleries.
  * Receives pre-extracted image paths from ReportMarkdown's carousel block parser.
+ *
+ * The Figma has no write-up detail page, so this is built from the design system used on the other pages:
+ * each slide uses the Home portrait look (14px radius, 1px gradient outline, soft drop shadow), the arrow buttons
+ * use the glass icon-button look from the footer, and the label and counter use the mono muted text style.
+ * Dark values come straight from the design; light mode falls back to the theme tokens.
  */
 "use client"
 
@@ -12,11 +17,30 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel"
-import { motion } from "framer-motion"
+import { MotionConfig, motion } from "framer-motion"
 
 interface MarkdownCarouselProps {
   srcs: string[]
 }
+
+/**
+ * 1px brand-gradient outline (#006fe0 -> #6826ea -> #2840d0), drawn by a masked ::before layer because a
+ * CSS border cannot take a gradient. The mask uses longhand properties so it can only ever cut out the ring
+ * and never fills the element. It sits above the image (z-10) and takes up no space.
+ */
+const gradientBorder: string =
+  "relative before:content-[''] before:pointer-events-none before:absolute before:inset-0 before:z-10 before:rounded-[inherit] before:p-px before:bg-[linear-gradient(98.77deg,#006fe0,#6826ea,#2840d0)] before:[mask-image:linear-gradient(#000,#000),linear-gradient(#000,#000)] before:[mask-clip:content-box,border-box] before:[mask-composite:exclude] before:[-webkit-mask-image:linear-gradient(#000,#000),linear-gradient(#000,#000)] before:[-webkit-mask-clip:content-box,border-box] before:[-webkit-mask-composite:xor]"
+
+/** Slide frame: the Home portrait look. 14px radius, 1px gradient outline, soft drop shadow, dark backing for letterboxing. */
+const slideFrame: string =
+  `${gradientBorder} overflow-hidden rounded-[14px] bg-muted/20 shadow-[0_24px_36px_rgba(0,0,0,0.18)] dark:bg-[rgba(10,10,10,0.4)]`
+
+/**
+ * Arrow button: 32px square with 8px radius, a 25% outline and no fill, with the glass treatment used on the
+ * footer icon buttons (4px blur, saturation boost, rim light on opposing edges). The rim light is dark-mode only.
+ */
+const arrowButton: string =
+  "size-8 rounded-[8px] border border-border bg-transparent text-foreground backdrop-blur-[4px] backdrop-saturate-150 hover:bg-muted/60 dark:border-[rgba(158,163,190,0.25)] dark:bg-transparent dark:text-[#fafafa] dark:shadow-[inset_1.5px_1.5px_0_rgba(255,255,255,0.3),inset_-1px_-1px_0_rgba(255,255,255,0.12),inset_0_0_14px_rgba(255,255,255,0.07)] dark:hover:bg-[rgba(28,30,43,0.4)] [&_svg]:size-4"
 
 /**
  * Renders a list of image paths as a paginated shadcn/ui Carousel.
@@ -27,43 +51,46 @@ export function MarkdownCarousel({ srcs }: MarkdownCarouselProps) {
   if (!srcs || srcs.length === 0) return null
 
   return (
-    <motion.div
-      className="my-12 px-10 sm:px-14"
-      initial={{ opacity: 0, y: 30 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-100px 0px" }}
-      transition={{ duration: 0.6, ease: "circOut" }}
-    >
-      <p className="mb-4 text-sm font-medium uppercase tracking-widest text-muted-foreground">
-        Screenshots
-      </p>
-      <Carousel
-        opts={{ align: "start", loop: true }}
-        className="w-full"
+    <MotionConfig reducedMotion="user">
+      <motion.div
+        className="my-12 px-10 sm:px-14"
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-100px 0px" }}
+        transition={{ duration: 0.6, ease: "circOut" }}
       >
-        <CarouselContent>
-          {srcs.map((src, index) => (
-            <CarouselItem key={index}>
-              <div className="overflow-hidden rounded-xl border border-border/50 bg-muted/20 shadow-lg">
-                <div className="relative aspect-video w-full">
-                  <Image
-                    src={src}
-                    alt={`Screenshot ${index + 1}`}
-                    fill
-                    className="object-contain"
-                    sizes="(max-width: 1024px) 100vw, 896px"
-                  />
+        <p className="mb-4 font-mono text-xs uppercase tracking-widest text-muted-foreground dark:text-[#9296b1]">
+          Screenshots
+        </p>
+        <Carousel
+          opts={{ align: "start", loop: true }}
+          className="w-full"
+          aria-label="Screenshot gallery"
+        >
+          <CarouselContent>
+            {srcs.map((src, index) => (
+              <CarouselItem key={index}>
+                <div className={slideFrame}>
+                  <div className="relative aspect-video w-full">
+                    <Image
+                      src={src}
+                      alt={`Screenshot ${index + 1}`}
+                      fill
+                      className="object-contain"
+                      sizes="(max-width: 1024px) 100vw, 896px"
+                    />
+                  </div>
                 </div>
-              </div>
-              <p className="mt-2 text-center text-xs text-muted-foreground">
-                {index + 1} / {srcs.length}
-              </p>
-            </CarouselItem>
-          ))}
-        </CarouselContent>
-        <CarouselPrevious />
-        <CarouselNext />
-      </Carousel>
-    </motion.div>
+                <p className="mt-3 text-center font-mono text-xs text-muted-foreground dark:text-[#9296b1]">
+                  {index + 1} / {srcs.length}
+                </p>
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+          <CarouselPrevious className={arrowButton} />
+          <CarouselNext className={arrowButton} />
+        </Carousel>
+      </motion.div>
+    </MotionConfig>
   )
 }
