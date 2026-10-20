@@ -2,8 +2,8 @@
  * Site-wide footer with navigation links, social icons, and copyright notice.
  * Rendered once in the root layout on every page.
  *
- * Styled to the "New Design" Figma footer: a 1150px-wide, 14px-radius glass panel with a faint (29%) brand-gradient
- * outline, three 335px columns with gradient accent bars, glass social icon buttons, and a tinted copyright bar.
+ * Styled to be a glass panel with a faint brand-gradient outline,
+ * three columns with gradient accent bars, glass social icon buttons, and a tinted copyright bar.
  * Dark values come straight from the design; light mode falls back to the theme tokens.
  */
 import Link from "next/link"
@@ -11,6 +11,7 @@ import { Mail } from "lucide-react"
 import { FaGithub, FaLinkedin } from "react-icons/fa"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
+import * as React from "react"
 
 /** Primary site navigation links, shared between the footer and nav bar. */
 const navItems = [
@@ -28,7 +29,7 @@ const socialLinks = [
 ]
 
 /**
- * 0.6px brand-gradient outline (#006fe0 -> #6826ea -> #2840d0), drawn by a masked ::before layer because a
+ * brand-gradient outline (#006fe0 -> #6826ea -> #2840d0), drawn by a masked ::before layer because a
  * CSS border cannot take a gradient. The mask uses longhand properties so it can only ever cut out the ring
  * and never fills the element. Takes up no space, so it never shifts layout. Set the strength with before:opacity-*.
  */
@@ -36,9 +37,8 @@ const gradientBorder: string =
   "relative before:content-[''] before:pointer-events-none before:absolute before:inset-0 before:rounded-[inherit] before:p-[0.6px] before:bg-[linear-gradient(98.77deg,#006fe0,#6826ea,#2840d0)] before:[mask-image:linear-gradient(#000,#000),linear-gradient(#000,#000)] before:[mask-clip:content-box,border-box] before:[mask-composite:exclude] before:[-webkit-mask-image:linear-gradient(#000,#000),linear-gradient(#000,#000)] before:[-webkit-mask-clip:content-box,border-box] before:[-webkit-mask-composite:xor]"
 
 /**
- * The footer panel: 20% black fill, 14px radius, and the Figma Glass effect (blur 4, depth 20) approximated with a
- * 4px backdrop blur, a saturation boost, and a gentle rim light on opposing edges (kept far fainter than on the
- * small buttons, because on a panel this big a strong rim looks heavy). The outline is only 29% opacity in the design.
+ * The footer panel: black fill, 14px radius, and the Figma Glass effect approximated with a backdrop blur,
+ * a saturation boost, and a gentle rim light on opposing edges. The outline is only 29% opacity in the design.
  * The rim light is dark-mode only; light mode uses the card colour.
  */
 const footerPanel: string =
@@ -49,17 +49,20 @@ const footerLink: string =
   "h-8 px-2 text-[13px] font-medium text-foreground hover:bg-muted/60 hover:text-foreground dark:text-[#fafafa] dark:hover:bg-[rgba(28,30,43,0.4)] dark:hover:text-[#fafafa]"
 
 /**
- * Social icon button: 28px square, 8px radius, 1px outline at 25% and no fill, with the same glass treatment as the
- * hero buttons (4px blur, saturation boost, rim light on opposing edges). 16px bright icon.
+ * Social icon button: 28px square, 8px radius, 1px outline at 25% and no fill,
+ * with the same glass treatment as the hero buttons. 16px bright icon.
  */
 const socialButton: string =
   "size-7 rounded-[8px] border border-border bg-transparent text-foreground backdrop-blur-[4px] backdrop-saturate-150 hover:bg-muted/60 dark:border-[rgba(158,163,190,0.25)] dark:bg-transparent dark:text-[#fafafa] dark:shadow-[inset_1.5px_1.5px_0_rgba(255,255,255,0.3),inset_-1px_-1px_0_rgba(255,255,255,0.12),inset_0_0_14px_rgba(255,255,255,0.07)] dark:hover:bg-[rgba(28,30,43,0.4)] [&_svg]:size-4"
 
+// Interface for the FooterSectionTitle component
+interface FooterSectionTitleProps {
+  children: React.ReactNode
+  className?: string
+}
+
 /** Section heading with a decorative gradient accent underline (48x4px bar). */
-function FooterSectionTitle({
-                              children,
-                              className,
-                            }: Readonly<{ children: React.ReactNode; className?: string }>) {
+function FooterSectionTitle({ children, className }:FooterSectionTitleProps) {
   return (
     <div className={cn("space-y-3", className)}>
       <h2 className="text-sm font-medium tracking-tight text-foreground dark:text-[#fafafa]">{children}</h2>
@@ -72,12 +75,15 @@ function FooterSectionTitle({
 }
 
 export function Footer() {
+  // Gets and stores the current year
   const year:number = new Date().getFullYear()
 
   return (
     <footer className="mt-auto w-full px-4 pt-8 pb-8 md:px-6 lg:px-8">
+      {/* Footer container */}
       <div className={footerPanel}>
         <div className="grid gap-10 px-6 py-8 md:grid-cols-3 md:px-8 md:py-10">
+          {/* Footer description */}
           <div className="space-y-4">
             <FooterSectionTitle>Kieran&#39;s CTF Write Ups</FooterSectionTitle>
             <p className="text-sm leading-relaxed text-muted-foreground dark:text-[#9296b1]">
@@ -86,6 +92,7 @@ export function Footer() {
             </p>
           </div>
 
+          {/* Footer navigation */}
           <div className="space-y-4">
             <FooterSectionTitle>Navigate</FooterSectionTitle>
             <nav
@@ -106,6 +113,7 @@ export function Footer() {
             </nav>
           </div>
 
+          {/* Footer social links*/}
           <div className="space-y-4">
             <FooterSectionTitle>Connect</FooterSectionTitle>
             <div className="flex flex-wrap gap-2">
