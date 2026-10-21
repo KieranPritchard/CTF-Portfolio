@@ -8,7 +8,7 @@ import Link from "next/link"
 import { CategoryTag } from "@/components/shared/CategoryTag"
 import type { ReportSummary } from "@/types/report"
 
-export function Timeline({ reports }: { reports: ReportSummary[] }) {
+export default function Timeline({ reports }: { reports: ReportSummary[] }) {
     return (
         <div className="space-y-6">
             <h3 className="font-bold text-xl">Timeline</h3>

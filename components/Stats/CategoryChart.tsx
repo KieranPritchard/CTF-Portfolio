@@ -10,15 +10,26 @@
 import { motion, useReducedMotion } from "framer-motion"
 import { CategoryTag, categoryStyle } from "@/components/shared/CategoryTag"
 
-export function CategoryChart({ data }: { data: { category: string, count: number }[] }) {
-  const max = Math.max(...data.map(d => d.count), 1)
+// Stores the interface for the category chart props
+interface CategoryChartProps {
+  data: {
+    category: string
+    count: number
+  }[]
+}
+
+export default function CategoryChart({ data }:CategoryChartProps ) {
+  // Stores the maximum number of categories
+  const max:number = Math.max(...data.map(d => d.count), 1)
   // People who prefer reduced motion get the bars at their final width straight away
-  const reduceMotion = useReducedMotion()
+  const reduceMotion:boolean | null = useReducedMotion()
 
   return (
     <div className="space-y-6">
+      {/* Heading for the chart */}
       <h3 className="text-xl font-bold text-foreground dark:text-[#fafafa]">Category Distribution</h3>
       <div className="space-y-4">
+        {/* Iterates over the data provided*/}
         {data.map((item, i) => (
           <div key={item.category} className="space-y-1.5">
             <div className="flex items-center justify-between gap-3">

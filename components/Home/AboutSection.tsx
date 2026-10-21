@@ -18,10 +18,16 @@ const sectionVariants: Variants = {
   },
 }
 
+// Interface for the fade up section props
+interface FadeUpSectionProps {
+  children: React.ReactNode
+  className?: string
+}
+
 /**
  * FadeUpSection - wraps content with a whileInView animation.
  */
-function FadeUpSection({ children, className }: { children: React.ReactNode; className?: string }) {
+function FadeUpSection({ children, className }:FadeUpSectionProps) {
   return (
     <motion.div
       className={className}

@@ -1,6 +1,7 @@
 import { ContactForm } from "@/components/Contact/ContactForm"
+import { Metadata } from "next"
 
-export const metadata = {
+export const metadata:Metadata = {
     title: "Contact | CTF Portfolio",
     description: "Get in touch for collaborations, CTFs, or security discussions.",
 }

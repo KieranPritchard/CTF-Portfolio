@@ -16,6 +16,12 @@ type Crumb = {
   href?: string 
 }
 
+// Interface for the report breadcrumbs
+interface ReportBreadcrumbsProps {
+  items: Crumb[]
+  className?: string
+}
+
 /**
  * ReportBreadcrumbs Component
  * 
@@ -25,21 +31,35 @@ type Crumb = {
  * @param items - An array of breadcrumb objects (label and optional href).
  * @param className - Optional CSS class name for the navigation container.
  */
-export function ReportBreadcrumbs({ items, className }: Readonly<{ items: Crumb[]; className?: string }>) {
+export default function ReportBreadcrumbs({ items, className }: ReportBreadcrumbsProps) {
   return (
-    <nav aria-label="Breadcrumb" className={cn("text-sm text-muted-foreground", className)}>
+    <nav
+      aria-label="Breadcrumb"
+      className={cn("text-sm text-muted-foreground", className)}
+    >
       <ol className="flex flex-wrap items-center gap-1">
         {items.map((item, index) => {
           const isLast = index === items.length - 1
 
           return (
-            <li key={`${item.label}-${index}`} className="flex items-center gap-1">
+            <li
+              key={`${item.label}-${index}`}
+              className="flex items-center gap-1"
+            >
               {/* Separator Icon: Hidden from screen readers */}
-              {index > 0 && <ChevronRight className="size-3.5 shrink-0 opacity-60" aria-hidden />}
-              
+              {index > 0 && (
+                <ChevronRight
+                  className="size-3.5 shrink-0 opacity-60"
+                  aria-hidden
+                />
+              )}
+
               {/* Interactive Link or Static Label */}
               {item.href && !isLast ? (
-                <Link href={item.href} className="hover:text-foreground transition-colors underline-offset-4 hover:underline">
+                <Link
+                  href={item.href}
+                  className="underline-offset-4 transition-colors hover:text-foreground hover:underline"
+                >
                   {item.label}
                 </Link>
               ) : (

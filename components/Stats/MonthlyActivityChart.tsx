@@ -1,19 +1,24 @@
 /**
  * Vertical bar chart showing write-up activity grouped by month.
  * Displays hover tooltips with exact counts and responsive month labels.
- *
- * Styled to the "New Design" Figma monthly chart: a bold 20px heading, a 192px plot with 16px of top padding and
- * 8px between bars, vertical brand-gradient bars (violet at the top, blue at the bottom) with 3px rounded tops,
- * a 1px #1c1e2b baseline, and 9px uppercase muted month labels sitting below it.
- * Dark values come straight from the design; light mode falls back to the theme tokens.
  */
 "use client"
+
 import { motion, useReducedMotion } from "framer-motion"
 
-export function MonthlyActivityChart({ data }: { data: { month: string, count: number }[] }) {
-  const max = Math.max(...data.map(d => d.count), 1)
+// Interface for the monthly activity chart
+interface MonthlyActivityChartProps {
+  data: {
+    month:string
+    count:number
+  }[]
+}
+
+export default function MonthlyActivityChart({ data }:MonthlyActivityChartProps) {
+  // Stores the maximum number from each month
+  const max:number = Math.max(...data.map(d => d.count), 1)
   // People who prefer reduced motion get the bars at their final height straight away
-  const reduceMotion = useReducedMotion()
+  const reduceMotion:boolean | null = useReducedMotion()
 
   return (
     <div className="space-y-6">

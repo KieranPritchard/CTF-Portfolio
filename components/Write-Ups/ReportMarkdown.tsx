@@ -26,14 +26,9 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { cn } from "@/lib/utils"
-import { MarkdownCarousel } from "@/components/Write-Ups/MarkdownCarousel"
+import MarkdownCarousel from "@/components/Write-Ups/MarkdownCarousel"
 
-/**
- * Brand-gradient outline (#006fe0 -> #6826ea -> #2840d0), drawn by a masked ::before layer because a
- * CSS border cannot take a gradient. The mask uses longhand properties so it can only ever cut out the ring
- * and never fills the element. The ring sits above the content (z-10) and takes up no space.
- * Add the thickness (before:p-px or before:p-[0.6px]) and, if wanted, a before:opacity-* with it.
- */
+// Stores the class for the gradient border
 const gradientBorder: string =
   "relative before:content-[''] before:pointer-events-none before:absolute before:inset-0 before:z-10 before:rounded-[inherit] before:bg-[linear-gradient(98.77deg,#006fe0,#6826ea,#2840d0)] before:[mask-image:linear-gradient(#000,#000),linear-gradient(#000,#000)] before:[mask-clip:content-box,border-box] before:[mask-composite:exclude] before:[-webkit-mask-image:linear-gradient(#000,#000),linear-gradient(#000,#000)] before:[-webkit-mask-clip:content-box,border-box] before:[-webkit-mask-composite:xor]"
 
@@ -62,6 +57,13 @@ const markdownItemVariants: Variants = {
   },
 }
 
+// Interface for fade up observer
+interface FadeUpObserverProps {
+  children: React.ReactNode
+  as?: "div" | "span"
+  className?: string
+}
+
 /**
  * FadeUpObserver Component
  *
@@ -70,8 +72,10 @@ const markdownItemVariants: Variants = {
  * sequentially as the user scrolls.
  *
  * @param children - The React elements to wrap with animation.
+ * @param as
+ * @param className
  */
-const FadeUpObserver = ({ children, as = "div", className }: { children: React.ReactNode, as?: "div" | "span", className?: string }) => {
+const FadeUpObserver = ({ children, as = "div", className }: FadeUpObserverProps) => {
   const Component = motion[as]
   return (
     <Component
@@ -131,7 +135,7 @@ function extractCarousel(content: string): { body: string; imageSrcs: string[] }
  *
  * @param content - The raw markdown string to render.
  */
-export function ReportMarkdown({ content }: Readonly<{ content: string }>) {
+export default function ReportMarkdown({ content }: Readonly<{ content: string }>) {
   const { body, imageSrcs } = extractCarousel(content)
 
   return (

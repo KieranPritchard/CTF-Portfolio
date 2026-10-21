@@ -2,9 +2,6 @@
  * Write-ups listing page with category filtering, search, and multiple view modes.
  * Supports grid, card, and list layouts with animated transitions.
  *
- * Styled to the "New Design" Figma Write-Ups page: a gradient page heading, a frosted filter panel with 30px
- * controls, and glass project cards whose outline, icon, tag and footer strip are tinted per category.
- * Dark values come straight from the design; light mode falls back to the theme tokens.
  */
 "use client"
 

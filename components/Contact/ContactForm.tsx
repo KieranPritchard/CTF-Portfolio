@@ -1,11 +1,6 @@
 /**
  * Contact page form with social links and a simulated message submission flow.
  * Shows a success state after the user submits the form.
- *
- * Styled to the "New Design" Figma Contact page: three glass channel cards (outline about 33%) beside a glass
- * "Send a Message" panel (outline about 55%), 32px fields with gradient outlines, indigo channel icons,
- * and a full-width gradient submit button with dark text.
- * Dark values come straight from the design; light mode falls back to the theme tokens.
  */
 "use client"
 
@@ -19,8 +14,8 @@ import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 
 /**
- * 0.6px brand-gradient outline (#006fe0 -> #6826ea -> #2840d0), drawn by a masked ::before layer because a
- * CSS border cannot take a gradient. The mask uses longhand properties so it can only ever cut out the ring
+ * brand-gradient outline (#006fe0 -> #6826ea -> #2840d0), drawn by a masked ::before layer.
+ * The mask uses longhand properties so it can only ever cut out the ring
  * and never fills the element. Takes up no space, so it never shifts layout. Set the strength with before:opacity-*.
  */
 const gradientBorder: string =
@@ -28,7 +23,7 @@ const gradientBorder: string =
 
 /**
  * Glass approximation shared by the panel and cards: a 4px backdrop blur, a saturation boost, and a gentle rim light
- * on opposing edges (the Figma Glass effect has blur 4, depth 20). The rim light is dark-mode only.
+ * on opposing edges. The rim light is dark-mode only.
  */
 const glass: string =
   "backdrop-blur-[4px] backdrop-saturate-150 dark:shadow-[inset_1.5px_1.5px_0_rgba(255,255,255,0.1),inset_-1px_-1px_0_rgba(255,255,255,0.04)]"
@@ -45,7 +40,7 @@ const formPanel: string = `${gradientBorder} ${glass} before:opacity-[0.55] flex
 
 /**
  * Field wrapper: an <input> cannot hold the gradient outline layer, so each field sits in a 10px-radius wrapper that
- * carries the 20% black fill and the outline (about 55%, full strength while the field has focus).
+ * carries the 20% black fill and the outline.
  */
 const fieldWrap: string = `${gradientBorder} before:opacity-[0.55] focus-within:before:opacity-100 rounded-[10px] bg-muted/30 dark:bg-[rgba(10,10,10,0.2)]`
 
@@ -73,10 +68,13 @@ const secondaryButton: string =
   "h-8 rounded-[8px] border-[0.6px] border-border bg-muted/60 px-2.5 text-sm font-semibold text-foreground backdrop-blur-[4px] backdrop-saturate-150 hover:bg-muted hover:text-foreground dark:border-transparent dark:bg-[rgba(28,30,45,0.45)] dark:text-[#fafafa] dark:shadow-[inset_0_0_0_0.6px_rgba(255,255,255,0.08),inset_1.5px_1.5px_0_rgba(255,255,255,0.3),inset_-1px_-1px_0_rgba(255,255,255,0.12),inset_0_0_14px_rgba(255,255,255,0.07)] dark:hover:bg-[rgba(28,30,45,0.8)] dark:hover:text-[#fafafa]"
 
 export function ContactForm() {
+  // Stores the state for wether the page is submitted or not
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
+  // Handler function for submission
   const handleSubmit = (e: React.FormEvent) => {
+    // Prevents the setting fields to default event
     e.preventDefault()
     setIsSubmitting(true)
     // Simulate network request

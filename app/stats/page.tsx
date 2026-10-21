@@ -1,10 +1,11 @@
 import { getAllReports } from "@/lib/reports"
-import { StatsCards } from "@/components/Stats/StatsCards"
-import { CategoryChart } from "@/components/Stats/CategoryChart"
-import { MonthlyActivityChart } from "@/components/Stats/MonthlyActivityChart"
-import { Timeline } from "@/components/Stats/Timeline"
+import StatsCards from "@/components/Stats/StatsCards"
+import CategoryChart from "@/components/Stats/CategoryChart"
+import MonthlyActivityChart from "@/components/Stats/MonthlyActivityChart"
+import Timeline from "@/components/Stats/Timeline"
+import { Metadata } from "next"
 
-export const metadata = {
+export const metadata:Metadata = {
     title: "Stats | CTF Portfolio",
     description: "A quantitative look at my research and write-ups.",
 }

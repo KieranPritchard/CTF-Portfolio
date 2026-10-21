@@ -1,9 +1,10 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getAllReports, getReportBySlug, getReportFileSlugs } from "@/lib/reports";
-import { ReportArticleHeader } from "@/components/Write-Ups/ReportArticleHeader";
-import { ReportBreadcrumbs } from "@/components/Write-Ups/ReportBreadcrumbs";
-import { ReportMarkdown } from "@/components/Write-Ups/ReportMarkdown";
+import  ReportArticleHeader  from "@/components/Write-Ups/ReportArticleHeader";
+import  ReportBreadcrumbs  from "@/components/Write-Ups/ReportBreadcrumbs";
+import  ReportMarkdown  from "@/components/Write-Ups/ReportMarkdown";
+import { Metadata } from "next"
 
 /**
  * 0.6px brand-gradient outline (#006fe0 -> #6826ea -> #2840d0), drawn by a masked ::before layer because a
@@ -15,7 +16,7 @@ const gradientBorder: string =
 
 /**
  * The "More write-ups" panel: the filter-panel look from the Write-Ups page. 14px radius, a gradient outline at
- * about 33% strength, and a 12.5% black fill in dark mode (the card colour in light mode).
+ * about 33% strength, and a 12.5% black fill in dark mode (the card color in light mode).
  */
 const relatedPanel: string =
   `${gradientBorder} before:opacity-[0.33] mt-16 rounded-[14px] bg-card p-6 dark:bg-[rgba(10,10,10,0.125)]`
@@ -29,7 +30,7 @@ export async function generateStaticParams() {
 }
 
 // Generates metadata
-export async function generateMetadata({ params }: Readonly<{ params: Promise<{ slug: string }> }>) {
+export async function generateMetadata({ params }: Readonly<{ params: Promise<{ slug: string }> }>):Promise<Metadata> {
   const { slug } = await params;
   const report = getReportBySlug(slug);
 
@@ -56,7 +57,7 @@ export default async function Page({ params }: Readonly<{ params: Promise<{ slug
   // Gets the related reports
   const related = getAllReports().filter((item) => item.slug !== report.slug).slice(0, 3);
 
-  // Splits out the markdown content from the rest of the report metadata
+  // Splits out the Markdown content from the rest of the report metadata
   const { content, ...summary } = report;
 
   return (
