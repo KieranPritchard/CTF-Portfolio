@@ -1,12 +1,8 @@
 /**
+ *
  * Renders write-up markdown content with custom typography, tables, images, and code blocks.
  * Extracts carousel image blocks and delegates them to MarkdownCarousel.
  *
- * The Figma has no write-up detail page, so this is built from the design system used on the other pages:
- * bright #fafafa body text and headings, muted #9296b1 secondary text, the filter-panel look for tables,
- * the Home portrait look (14px radius, 1px gradient outline, soft drop shadow) for images, and the design's
- * faint divider and control-outline colours for rules, quotes and code.
- * Dark values come straight from the design; light mode falls back to the theme tokens.
  */
 "use client"
 
@@ -222,7 +218,7 @@ export default function ReportMarkdown({ content }: Readonly<{ content: string }
               return (
                 <FadeUpObserver as="span" className="my-10 block">
                 <span className={imageFrame}>
-                  <img
+                  <Image
                     src={src}
                     alt={alt ?? ""}
                     className="w-full object-cover"

@@ -5,6 +5,7 @@
 "use client"
 
 import { Variants, motion } from "framer-motion"
+import Image from "next/image"
 
 /**
  * Animation variants for scroll-triggered fade-up elements.
@@ -87,9 +88,10 @@ export default function AboutSection() {
         {/* Right Column: Visual Placeholder — hidden on mobile */}
         <FadeUpSection className="relative hidden flex-col justify-center p-8 sm:p-16 md:flex">
           {/* Main Large Center/Right Placeholder Box */}
-          <img
+          <Image
             className="gradient-border aspect-4/5 w-full max-w-md self-center rounded-xl bg-muted/30 shadow-2xl md:self-end"
             src={"/kieran-pritchard.jpg"}
+            alt={"Image of Kieran stood in front of some greenery"}
           />
         </FadeUpSection>
       </div>

@@ -2,11 +2,11 @@ import "server-only"
 import fs from "fs"
 import path from "path"
 import matter from "gray-matter"
-import type { ReportCategory, ReportDoc, ReportSummary } from "@/types/report"
+import type {  ReportDoc, ReportSummary } from "@/types/report"
 import { isReportCategory } from "@/lib/categories"
 
 // Contains the path to the directory storing the content files
-const contentDir = path.join(process.cwd(), "content/reports")
+const contentDir:string = path.join(process.cwd(), "content/reports")
 
 // Function to normalise frontmatter
 function normalizeFrontmatter(data: Record<string, unknown>): ReportDoc | null {
@@ -58,7 +58,7 @@ export function getReportBySlug(slug: string): ReportDoc | null {
         return null
     }
 
-    // Read and parse markdown file
+    // Read and parse Markdown file
     const raw = fs.readFileSync(fullPath, "utf8")
     const { data, content } = matter(raw)
     
@@ -84,9 +84,9 @@ function reportSummaryFromDoc(doc: ReportDoc): ReportSummary {
     return { title, slug, category, description, date }
 }
 
-// Function to get all of the reports
+// Function to get all the reports
 export function getAllReports(): ReportSummary[] {
-    // Gets all of the items
+    // Gets all the items
     const items = getReportFileSlugs()
         .map((fileSlug) => getReportBySlug(fileSlug))
         .filter((doc): doc is ReportDoc => doc !== null)
