@@ -1,7 +1,7 @@
 ---
 title: "Overpass"
 slug: "overpass"
-category: "web"
+category: "web-application"
 description: "Exploit a Linux machine running a vulnerable login portal in this beginner level challenge."
 date: "2026-10-15"
 ---
